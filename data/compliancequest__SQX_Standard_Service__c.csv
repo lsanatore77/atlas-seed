@@ -1,0 +1,6 @@
+"Id","Name","compliancequest__Description__c"
+"S05000000000000001","Final Assembly","Airframe, motor and electronics integration"
+"S05000000000000002","Motor Winding","Stator winding and motor balancing"
+"S05000000000000003","PCB Reflow Soldering","SMT placement and reflow of flight controller boards"
+"S05000000000000004","Firmware Flashing","Loading and verifying flight firmware"
+"S05000000000000005","Flight Test","End-of-line hover and stability test"

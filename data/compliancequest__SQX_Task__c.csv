@@ -1,0 +1,2 @@
+"Id","Name","RecordTypeId","RecordType.DeveloperName","compliancequest__Task_Type__c","compliancequest__Record_Type__c","compliancequest__Active__c","compliancequest__Allowed_Days__c","compliancequest__Description__c"
+"S17000000000000001","Atlas Drone Lot History Review","RT0000003210684151","Complaint_Management_Step","PHR","Complaint","TRUE","10","Lot-based product history review for Atlas drone complaints: build records, related NCs, other complaints, supplier quality and containment."

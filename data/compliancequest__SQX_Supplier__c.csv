@@ -1,0 +1,6 @@
+"Id","Name","compliancequest__Supplier_Number__c","compliancequest__SQX_Account__c","compliancequest__SQX_Account__r.Name","compliancequest__Type__c","compliancequest__Supplier_Type__c","compliancequest__Qualification_Status__c","compliancequest__Supplier_QMS_Status__c","compliancequest__Supplier_Supply_Chain_Status__c","compliancequest__Status__c","compliancequest__Active__c"
+"S08000000000000001","Voltcore Motors","Voltcore Motors","S06000000000000001","Voltcore Motors","Manufacturer","Corporation","Draft","Preliminary","Preliminary","Active","Yes"
+"S08000000000000002","Helion Cell Co.","Helion Cell Co.","S06000000000000002","Helion Cell Co.","Manufacturer","Corporation","Draft","Preliminary","Preliminary","Active","Yes"
+"S08000000000000003","Brightline PCB","Brightline PCB","S06000000000000003","Brightline PCB","Manufacturer","Corporation","Draft","Preliminary","Preliminary","Active","Yes"
+"S08000000000000004","Carbonworks Composites","Carbonworks Composites","S06000000000000004","Carbonworks Composites","Manufacturer","Corporation","Draft","Preliminary","Preliminary","Active","Yes"
+"S08000000000000005","Optiview Optics","Optiview Optics","S06000000000000005","Optiview Optics","Distributor","Corporation","Draft","Preliminary","Preliminary","Active","Yes"

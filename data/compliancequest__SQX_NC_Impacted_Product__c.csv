@@ -1,0 +1,5 @@
+"Id","compliancequest__SQX_Nonconformance__c","compliancequest__SQX_Nonconformance__r.compliancequest__NC_Title__c","compliancequest__SQX_Impacted_Part__c","compliancequest__SQX_Impacted_Part__r.compliancequest__Part_Number__c","compliancequest__Lot_Number__c","compliancequest__Lot_Quantity__c"
+"S20000000000000001","S19000000000000001","Bearing noise on 2306 motors - lot 2410-07","S12000000000000002","ATL-PR-2306","LOT-PR-2410-07","120"
+"S20000000000000002","S19000000000000002","Hairline cracks in AX-200 carbon arms","S12000000000000001","ATL-AF-200","LOT-AF-2410-01","45"
+"S20000000000000003","S19000000000000003","Cold solder joints on F7 boards from Brightline PCB","S12000000000000004","ATL-EL-F7FC","LOT-EL-2409-03","200"
+"S20000000000000004","S19000000000000004","Battery labels printed with wrong capacity","S12000000000000003","ATL-PW-4S5000","LOT-PW-2410-12","300"

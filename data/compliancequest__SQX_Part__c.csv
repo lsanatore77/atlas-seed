@@ -1,0 +1,6 @@
+"Id","compliancequest__Part_Number__c","Name","cqext__Title__c","compliancequest__Part_Family__c","compliancequest__Part_Family__r.Name","compliancequest__Active__c","compliancequest__Part_Risk_Level__c","compliancequest__Part_Type__c","compliancequest__Part_Description__c"
+"S12000000000000001","ATL-AF-200","AX-200 Carbon Arm Assembly","AX-200 Carbon Arm Assembly","S11000000000000001","Airframes","TRUE","3","Sub Assembly","AX-200 Carbon Arm Assembly supplied by Carbonworks Composites"
+"S12000000000000002","ATL-PR-2306","2306 Brushless Motor 2450KV","2306 Brushless Motor 2450KV","S11000000000000002","Propulsion","TRUE","4","Sub Assembly","2306 Brushless Motor 2450KV supplied by Voltcore Motors"
+"S12000000000000003","ATL-PW-4S5000","4S 5000mAh LiPo Battery Pack","4S 5000mAh LiPo Battery Pack","S11000000000000003","Power","TRUE","5","Sub Assembly","4S 5000mAh LiPo Battery Pack supplied by Helion Cell Co."
+"S12000000000000004","ATL-EL-F7FC","F7 Flight Controller Board","F7 Flight Controller Board","S11000000000000004","Electronics","TRUE","4","Sub Assembly","F7 Flight Controller Board supplied by Brightline PCB"
+"S12000000000000005","ATL-IM-4KG","4K 3-Axis Gimbal Camera Module","4K 3-Axis Gimbal Camera Module","S11000000000000005","Imaging","TRUE","2","Sub Assembly","4K 3-Axis Gimbal Camera Module supplied by Optiview Optics"

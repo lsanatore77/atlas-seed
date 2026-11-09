@@ -1,0 +1,12 @@
+# SFDMU run output
+data/target/
+data/logs/
+data/reports/
+data/source/
+data/*.log
+# Local Salesforce CLI state
+.sf/
+.sfdx/
+# Python / Office temp files
+__pycache__/
+~$*

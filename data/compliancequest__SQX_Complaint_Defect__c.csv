@@ -1,0 +1,6 @@
+"Id","compliancequest__SQX_Complaint__c","compliancequest__SQX_Complaint__r.compliancequest__Complaint_Title__c","compliancequest__SQX_Defect_Code__c","compliancequest__SQX_Defect_Code__r.Name","compliancequest__SQX_Part__c","compliancequest__SQX_Part__r.compliancequest__Part_Number__c","compliancequest__Lot_Ser_Number__c","compliancequest__Defective_Quantity__c"
+"S24000000000000001","S23000000000000001","Motor failed mid-flight and drone lost altitude","S14000000000000007","Flyaway / Loss of Control","S12000000000000002","ATL-PR-2306","LOT-PR-2410-07","1"
+"S24000000000000002","S23000000000000002","Battery pack swelled after third charge","S14000000000000006","Battery Swelling","S12000000000000003","ATL-PW-4S5000","LOT-PW-2410-12","2"
+"S24000000000000003","S23000000000000003","Gimbal image drifts left during flight","S14000000000000008","Gimbal Drift","S12000000000000005","ATL-IM-4KG","LOT-IM-2408-05","1"
+"S24000000000000004","S23000000000000004","Front-left arm snapped on a normal landing","S14000000000000009","Prop Arm Snap","S12000000000000001","ATL-AF-200","LOT-AF-2410-01","1"
+"S24000000000000005","S23000000000000005","Drone won't power on out of the box","S14000000000000010","Won't Power On","S12000000000000004","ATL-EL-F7FC","LOT-EL-2409-03","1"

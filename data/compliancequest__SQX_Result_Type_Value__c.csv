@@ -1,0 +1,3 @@
+"Id","Name","compliancequest__SQX_Result_Type__c","compliancequest__SQX_Result_Type__r.Name","cqext__Response_Label__c","cqext__Response_Value__c","compliancequest__Color__c","cqext__Language__c"
+"S16000000000000001","True","S15000000000000001","Yes/No","True","True","212121-4aa564","English"
+"S16000000000000002","False","S15000000000000001","Yes/No","False","False","ffffff-ff0008","English"

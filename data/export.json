@@ -1,0 +1,139 @@
+{
+  "objects": [
+    {
+      "query": "SELECT Id, DeveloperName, NamespacePrefix, SobjectType FROM RecordType",
+      "operation": "Readonly",
+      "externalId": "DeveloperName;NamespacePrefix;SobjectType"
+    },
+    {
+      "query": "SELECT Id, Name FROM compliancequest__SQX_Division__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name FROM compliancequest__SQX_Business_Unit__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__SQX_Business_Unit__c FROM compliancequest__SQX_Site__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name FROM compliancequest__SQX_Department__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__Description__c FROM compliancequest__SQX_Standard_Service__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name, RecordTypeId, BillingCity, BillingState, BillingCountry, Description FROM Account",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, FirstName, LastName, Email, Title, AccountId FROM Contact",
+      "operation": "Upsert",
+      "externalId": "Email"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__Supplier_Number__c, compliancequest__SQX_Account__c, compliancequest__Type__c, compliancequest__Supplier_Type__c, compliancequest__Qualification_Status__c, compliancequest__Supplier_QMS_Status__c, compliancequest__Supplier_Supply_Chain_Status__c, compliancequest__Status__c, compliancequest__Active__c FROM compliancequest__SQX_Supplier__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Supplier_Number__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__SQX_Supplier__c, compliancequest__SQX_Contact__c FROM compliancequest__SQX_Supplier_Contact__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Supplier__r.compliancequest__Supplier_Number__c;compliancequest__SQX_Contact__r.Email"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Identification_Number__c, compliancequest__Full_Name__c, compliancequest__Job_Title__c, compliancequest__Personnel_Status__c, compliancequest__Active__c, compliancequest__Employment_Type__c, compliancequest__Email_Address__c, compliancequest__SQX_Department__c, compliancequest__SQX_Site__c, compliancequest__SQX_Business_Unit__c FROM compliancequest__SQX_Personnel__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Identification_Number__c"
+    },
+    {
+      "query": "SELECT Id, Name FROM compliancequest__SQX_Part_Family__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Part_Number__c, Name, cqext__Title__c, compliancequest__Part_Family__c, compliancequest__Active__c, compliancequest__Part_Risk_Level__c, compliancequest__Part_Type__c, compliancequest__Part_Description__c FROM compliancequest__SQX_Part__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Part_Number__c"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__Part_Number__c, compliancequest__Manufacturing_Date__c, compliancequest__Expiration_Date__c FROM compliancequest__SQX_Lot_Info__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name, RecordTypeId, compliancequest__Type__c, compliancequest__Defect_Category__c, compliancequest__Level__c, compliancequest__Active__c, compliancequest__Description__c FROM compliancequest__SQX_Defect_Code__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name FROM compliancequest__SQX_Result_Type__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__SQX_Result_Type__c, cqext__Response_Label__c, cqext__Response_Value__c, compliancequest__Color__c, cqext__Language__c FROM compliancequest__SQX_Result_Type_Value__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Result_Type__r.Name;Name"
+    },
+    {
+      "query": "SELECT Id, Name, RecordTypeId, compliancequest__Task_Type__c, compliancequest__Record_Type__c, compliancequest__Active__c, compliancequest__Allowed_Days__c, compliancequest__Description__c FROM compliancequest__SQX_Task__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__SQX_Task__c, RecordTypeId, compliancequest__QuestionText__c, compliancequest__Answer_Type__c, compliancequest__SQX_Result_Type__c, compliancequest__Picklist_Category__c, compliancequest__Allow_Comment__c FROM compliancequest__SQX_Task_Question__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Task__r.Name;Name"
+    },
+    {
+      "query": "SELECT Id, compliancequest__NC_Title__c, compliancequest__Type__c, compliancequest__Type_Of_Issue__c, compliancequest__Is_Part_Impacted__c, compliancequest__SQX_Part__c, compliancequest__SQX_Service__c, compliancequest__SQX_Supplier__c, compliancequest__SQX_Account__c, compliancequest__SQX_External_Contact__c, compliancequest__SQX_Site__c, compliancequest__SQX_Division__c, compliancequest__SQX_Business_Unit__c, compliancequest__SQX_Department__c, compliancequest__Occurrence_Date__c, compliancequest__Aware_Date__c, compliancequest__Description__c, compliancequest__Status__c, compliancequest__Record_Stage__c FROM compliancequest__SQX_Nonconformance__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__NC_Title__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__SQX_Nonconformance__c, compliancequest__SQX_Impacted_Part__c, compliancequest__Lot_Number__c, compliancequest__Lot_Quantity__c FROM compliancequest__SQX_NC_Impacted_Product__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Nonconformance__r.compliancequest__NC_Title__c;compliancequest__Lot_Number__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__SQX_Nonconformance__c, compliancequest__SQX_Defect_Code__c, compliancequest__SQX_Part__c, compliancequest__Lot_Ser_Number__c, compliancequest__Defective_Quantity__c, compliancequest__Number_of_defects__c FROM compliancequest__SQX_NC_Defect__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Nonconformance__r.compliancequest__NC_Title__c;compliancequest__SQX_Defect_Code__r.Name"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Title__c, compliancequest__SQX_Nonconformance__c, compliancequest__Description__c, compliancequest__Due_Date__c, compliancequest__Status__c FROM compliancequest__SQX_Containment__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Title__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Complaint_Title__c, compliancequest__SQX_Account__c, compliancequest__SQX_External_Contact__c, compliancequest__SQX_Part__c, compliancequest__SQX_Part_Family__c, compliancequest__SQX_Lot_Info__c, compliancequest__Lot_Number__c, compliancequest__SQX_Complaint_Code__c, compliancequest__Occurrence_Date__c, compliancequest__Aware_Date__c, compliancequest__Reported_Date__c, compliancequest__Complaint_Quantity__c, compliancequest__Country_of_Origin__c, compliancequest__Complaint_Record_Type__c, compliancequest__SQX_Site__c, compliancequest__SQX_Division__c, compliancequest__SQX_Business_Unit__c, compliancequest__Description_As_Reported__c, compliancequest__Description__c, compliancequest__Status__c, compliancequest__Record_Stage__c FROM compliancequest__SQX_Complaint__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Complaint_Title__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__SQX_Complaint__c, compliancequest__SQX_Defect_Code__c, compliancequest__SQX_Part__c, compliancequest__Lot_Ser_Number__c, compliancequest__Defective_Quantity__c FROM compliancequest__SQX_Complaint_Defect__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Complaint__r.compliancequest__Complaint_Title__c;compliancequest__SQX_Defect_Code__r.Name"
+    },
+    {
+      "query": "SELECT Id, compliancequest__SQX_Complaint__c, RecordTypeId, compliancequest__SQX_Part__c, compliancequest__SQX_Part_Family__c, compliancequest__Lot_Number__c, compliancequest__Type_of_Investigation__c, compliancequest__Status__c, compliancequest__Record_Stage__c, compliancequest__Investigation_Summary__c FROM compliancequest__SQX_Investigation__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Complaint__r.compliancequest__Complaint_Title__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__SQX_Complaint__c, compliancequest__SQX_Task__c, compliancequest__Status__c, compliancequest__Product_History_Review_Summary__c FROM compliancequest__SQX_Product_History_Review__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Complaint__r.compliancequest__Complaint_Title__c"
+    }
+  ]
+}

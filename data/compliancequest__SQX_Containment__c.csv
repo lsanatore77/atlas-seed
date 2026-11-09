@@ -1,0 +1,4 @@
+"Id","compliancequest__Title__c","compliancequest__SQX_Nonconformance__c","compliancequest__SQX_Nonconformance__r.compliancequest__NC_Title__c","compliancequest__Description__c","compliancequest__Due_Date__c","compliancequest__Status__c"
+"S22000000000000001","Quarantine remaining lot 2410-07 motors in the MRB cage","S19000000000000001","Bearing noise on 2306 motors - lot 2410-07","Quarantine remaining lot 2410-07 motors in the MRB cage","2027-06-30","Draft"
+"S22000000000000002","100% X-ray inspection of incoming F7 boards until further notice","S19000000000000003","Cold solder joints on F7 boards from Brightline PCB","100% X-ray inspection of incoming F7 boards until further notice","2027-06-30","Draft"
+"S22000000000000003","Hold and relabel all lot 2410-12 packs in finished goods","S19000000000000004","Battery labels printed with wrong capacity","Hold and relabel all lot 2410-12 packs in finished goods","2027-06-30","Draft"
