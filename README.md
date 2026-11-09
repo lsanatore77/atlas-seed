@@ -18,10 +18,10 @@ check for and skip. It's labelled CAUTION in CQ: fine in a scratch org, remove i
 
 Results and errors land in `data\target` and `data\logs`.
 
-## What loads (26 objects, 108 records)
+## What loads (26 objects, 109 records)
 
 Divisions, Business Unit, Sites, Departments, Processes, Accounts, Contacts, Suppliers, Supplier Contacts, Personnel,
-Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, PHR CQ Task + 5 Questions,
+Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks (PHR task + 5 Questions, Investigation task),
 5 Nonconformances (+ Impacted Products, Defects, Containments), 5 Complaints (+ Defects),
 2 Complaint Investigations, 2 Product History Reviews.
 

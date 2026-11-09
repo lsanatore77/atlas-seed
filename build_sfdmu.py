@@ -168,7 +168,7 @@ add("compliancequest__SQX_Task__c", "Name", task_cols,
     [{"Name": r["Task Name (Seed Key)"], "RecordType.DeveloperName": "Complaint_Management_Step",
       f"{CQ}Task_Type__c": r["Task Type"], f"{CQ}Record_Type__c": r["Record Type (picklist)"],
       f"{CQ}Active__c": tf(r["Active"]), f"{CQ}Allowed_Days__c": r["Allowed Days"],
-      f"{CQ}Description__c": r["Description"]} for r in rows("PHR Task")],
+      f"{CQ}Description__c": r["Description"]} for r in rows("CQ Tasks")],
     query_fields=["Name", "RecordTypeId"] + task_cols[2:])
 
 q_cols = ["Name", f"{CQ}SQX_Task__r.Name", "RecordType.DeveloperName", f"{CQ}QuestionText__c", f"{CQ}Answer_Type__c",
