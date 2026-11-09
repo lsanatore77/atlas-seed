@@ -134,6 +134,36 @@
       "query": "SELECT Id, compliancequest__SQX_Complaint__c, compliancequest__SQX_Task__c, compliancequest__Status__c, compliancequest__Product_History_Review_Summary__c FROM compliancequest__SQX_Product_History_Review__c",
       "operation": "Upsert",
       "externalId": "compliancequest__SQX_Complaint__r.compliancequest__Complaint_Title__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Document_Number__c, compliancequest__Title__c, RecordTypeId, compliancequest__Document_Status__c, compliancequest__Revision__c, compliancequest__Document_Category__c, compliancequest__SQX_Business_Unit__c, compliancequest__Description__c FROM compliancequest__SQX_Controlled_Document__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Document_Number__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__SQX_Controlled_Document__c, compliancequest__Section__c, compliancequest__Topic__c, compliancequest__Objective__c, compliancequest__Result_Type__c FROM compliancequest__SQX_Doc_Criterion_Requirement__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Controlled_Document__r.compliancequest__Document_Number__c;compliancequest__Topic__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Title__c, compliancequest__Audit_Program_Year__c, compliancequest__Status__c, compliancequest__Record_Stage__c, compliancequest__Objective__c FROM compliancequest__SQX_Audit_Program__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Title__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__SQX_Audit_Program__c, compliancequest__SQX_Audit_Criteria_Document__c FROM compliancequest__SQX_Audit_Program_Scope__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Audit_Program__r.compliancequest__Title__c;compliancequest__SQX_Audit_Criteria_Document__r.compliancequest__Document_Number__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Title__c, compliancequest__Auto_Set_Title__c, compliancequest__Audit_Type__c, compliancequest__Audit_Category__c, compliancequest__Audit_Format__c, compliancequest__Status__c, compliancequest__Stage__c, compliancequest__SQX_Audit_Program__c, compliancequest__SQX_Audit_Criteria_Document__c, compliancequest__Audit_Year__c, compliancequest__SQX_Business_Unit__c, compliancequest__SQX_Division__c, compliancequest__SQX_Site__c, compliancequest__SQX_Department__c, compliancequest__Account__c, compliancequest__SQX_Supplier__c, compliancequest__Start_Date__c, compliancequest__End_Date__c, compliancequest__Scope_Description__c FROM compliancequest__SQX_Audit__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Title__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Title__c, RecordTypeId, compliancequest__SQX_Audit__c, compliancequest__Finding_Type__c, compliancequest__Status__c, compliancequest__SQX_Site__c, compliancequest__SQX_Department__c, compliancequest__SQX_Supplier__c, compliancequest__Issue_Date__c, compliancequest__Due_Date__c, compliancequest__Description__c FROM compliancequest__SQX_Finding__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Title__c"
     }
   ]
 }

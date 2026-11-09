@@ -18,12 +18,13 @@ check for and skip. It's labelled CAUTION in CQ: fine in a scratch org, remove i
 
 Results and errors land in `data\target` and `data\logs`.
 
-## What loads (26 objects, 109 records)
+## What loads (32 objects, 128 records)
 
 Divisions, Business Unit, Sites, Departments, Processes, Accounts, Contacts, Suppliers, Supplier Contacts, Personnel,
 Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks (PHR task + 5 Questions, Investigation task),
 5 Nonconformances (+ Impacted Products, Defects, Containments), 5 Complaints (+ Defects),
-2 Complaint Investigations, 2 Product History Reviews.
+2 Complaint Investigations, 2 Product History Reviews,
+2 Audit Criteria documents (+ 8 Requirements), 1 Audit Program (+ 2 Scopes), 3 Audits, 3 Audit Findings.
 
 ## Choices made when converting from the spreadsheet
 
@@ -39,6 +40,16 @@ Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks
   Division by site (Houston = Consumer Drones, Piscataway = Commercial Drones).
 - **PHRs** link to the complaint and the Atlas PHR task, not to the investigation.
   CQ builds PHR checklists when a PHR is created from the complaint's PHR step; a loaded PHR may not get them.
+
+## Audits
+
+- **Audit Criteria documents load as Draft.** CQ only lets requirements be added to a Draft document.
+  Release them by hand before moving audits forward.
+- **Audit checklists are not loaded.** CQ copies the criteria's requirements into the checklist as the audit moves on.
+- **Audits use the org's default record type.** "Standard Audit" in the dev sandbox was created in that org, not by CQ.
+- **Lead Auditor and Auditee Contact are blank** (users differ per org); fill them in when you work the audit.
+- Record types the load user's profile needs: Audit_Criteria (Controlled Document) and Audit_Finding (Finding),
+  on top of the ones listed in `data/RecordType.csv`.
 
 ## Rebuild
 

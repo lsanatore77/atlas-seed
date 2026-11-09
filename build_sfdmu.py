@@ -298,6 +298,75 @@ add("compliancequest__SQX_Product_History_Review__c", CR, phr_cols,
       f"{CQ}Product_History_Review_Summary__c": r["Summary"]} for r in rows("Product History Reviews")],
     query_fields=[f"{CQ}SQX_Complaint__c", f"{CQ}SQX_Task__c", f"{CQ}Status__c", f"{CQ}Product_History_Review_Summary__c"])
 
+
+# ---------- Audits ----------
+DOCR = f"{CQ}SQX_Controlled_Document__r.{CQ}Document_Number__c"
+CRITR = f"{CQ}SQX_Audit_Criteria_Document__r.{CQ}Document_Number__c"
+PROGR = f"{CQ}SQX_Audit_Program__r.{CQ}Title__c"
+AUDR = f"{CQ}SQX_Audit__r.{CQ}Title__c"
+
+# Audit criteria are Controlled Documents with the Audit_Criteria record type. Loaded as Draft:
+# requirements can only be added to a Draft document; release them by hand afterwards.
+ac_cols = [f"{CQ}Document_Number__c", f"{CQ}Title__c", "RecordType.DeveloperName", f"{CQ}Document_Status__c",
+           f"{CQ}Revision__c", f"{CQ}Document_Category__c", f"{CQ}SQX_Business_Unit__r.Name", f"{CQ}Description__c"]
+add("compliancequest__SQX_Controlled_Document__c", f"{CQ}Document_Number__c", ac_cols,
+    [{f"{CQ}Document_Number__c": r["Document Number (Seed Key)"], f"{CQ}Title__c": r["Title"],
+      "RecordType.DeveloperName": "Audit_Criteria", f"{CQ}Document_Status__c": r["Document Status"],
+      f"{CQ}Revision__c": r["Revision"], f"{CQ}Document_Category__c": r["Document Category"],
+      f"{CQ}SQX_Business_Unit__r.Name": r["Business Unit"], f"{CQ}Description__c": r["Description"]}
+     for r in rows("Audit Criteria")],
+    query_fields=[f"{CQ}Document_Number__c", f"{CQ}Title__c", "RecordTypeId", f"{CQ}Document_Status__c",
+                  f"{CQ}Revision__c", f"{CQ}Document_Category__c", f"{CQ}SQX_Business_Unit__c", f"{CQ}Description__c"])
+
+req_cols = [DOCR, f"{CQ}Section__c", f"{CQ}Topic__c", f"{CQ}Objective__c", f"{CQ}Result_Type__c"]
+add("compliancequest__SQX_Doc_Criterion_Requirement__c", f"{DOCR};{CQ}Topic__c", req_cols,
+    [{DOCR: r["Audit Criteria (Document Number)"], f"{CQ}Section__c": r["Section"], f"{CQ}Topic__c": r["Topic"],
+      f"{CQ}Objective__c": r["Objective"], f"{CQ}Result_Type__c": r["Result Type"]}
+     for r in rows("Criterion Requirements")],
+    query_fields=[f"{CQ}SQX_Controlled_Document__c"] + req_cols[1:])
+
+prog_cols = [f"{CQ}Title__c", f"{CQ}Audit_Program_Year__c", f"{CQ}Status__c", f"{CQ}Record_Stage__c", f"{CQ}Objective__c"]
+add("compliancequest__SQX_Audit_Program__c", f"{CQ}Title__c", prog_cols,
+    [{f"{CQ}Title__c": r["Title (Seed Key)"], f"{CQ}Audit_Program_Year__c": str(r["Audit Program Year"]),
+      f"{CQ}Status__c": r["Status"], f"{CQ}Record_Stage__c": r["Stage"], f"{CQ}Objective__c": r["Objective"]}
+     for r in rows("Audit Program")])
+
+add("compliancequest__SQX_Audit_Program_Scope__c", f"{PROGR};{CRITR}", [PROGR, CRITR],
+    [{PROGR: r["Audit Program"], CRITR: r["Audit Criteria (Document Number)"]} for r in rows("Audit Program Scope")],
+    query_fields=[f"{CQ}SQX_Audit_Program__c", f"{CQ}SQX_Audit_Criteria_Document__c"])
+
+# No record type on audits: "Standard_Audit" in the dev sandbox is org-made, not CQ's, so audits take the org default.
+# Auto_Set_Title is off so CQ keeps our title (it is the external ID).
+aud_cols = [f"{CQ}Title__c", f"{CQ}Auto_Set_Title__c", f"{CQ}Audit_Type__c", f"{CQ}Audit_Category__c",
+            f"{CQ}Audit_Format__c", f"{CQ}Status__c", f"{CQ}Stage__c", PROGR, CRITR, f"{CQ}Audit_Year__c",
+            f"{CQ}SQX_Business_Unit__r.Name", f"{CQ}SQX_Division__r.Name", f"{CQ}SQX_Site__r.Name",
+            f"{CQ}SQX_Department__r.Name", f"{CQ}Account__r.Name", f"{CQ}SQX_Supplier__r.{CQ}Supplier_Number__c",
+            f"{CQ}Start_Date__c", f"{CQ}End_Date__c", f"{CQ}Scope_Description__c"]
+add("compliancequest__SQX_Audit__c", f"{CQ}Title__c", aud_cols,
+    [{f"{CQ}Title__c": r["Title (Seed Key)"], f"{CQ}Auto_Set_Title__c": "FALSE", f"{CQ}Audit_Type__c": r["Audit Type"],
+      f"{CQ}Audit_Category__c": r["Audit Category"], f"{CQ}Audit_Format__c": r["Audit Format"],
+      f"{CQ}Status__c": r["Status"], f"{CQ}Stage__c": r["Stage"], PROGR: r["Audit Program"],
+      CRITR: r["Audit Criteria (Document Number)"], f"{CQ}Audit_Year__c": str(r["Plan Year"]),
+      f"{CQ}SQX_Business_Unit__r.Name": r["Business Unit"], f"{CQ}SQX_Division__r.Name": r["Division"],
+      f"{CQ}SQX_Site__r.Name": r["Site"], f"{CQ}SQX_Department__r.Name": r["Department"],
+      f"{CQ}Account__r.Name": r["Account"], f"{CQ}SQX_Supplier__r.{CQ}Supplier_Number__c": r["Supplier"],
+      f"{CQ}Start_Date__c": str(r["Start Date"])[:10], f"{CQ}End_Date__c": str(r["End Date"])[:10],
+      f"{CQ}Scope_Description__c": r["Scope/Description"]} for r in rows("Audits")],
+    query_fields=[c.replace("__r.Name", "__c").replace(f"__r.{CQ}Supplier_Number__c", "__c")
+                  .replace(f"__r.{CQ}Title__c", "__c").replace(f"__r.{CQ}Document_Number__c", "__c") for c in aud_cols])
+
+fnd_cols = [f"{CQ}Title__c", "RecordType.DeveloperName", AUDR, f"{CQ}Finding_Type__c", f"{CQ}Status__c",
+            f"{CQ}SQX_Site__r.Name", f"{CQ}SQX_Department__r.Name", f"{CQ}SQX_Supplier__r.{CQ}Supplier_Number__c",
+            f"{CQ}Issue_Date__c", f"{CQ}Due_Date__c", f"{CQ}Description__c"]
+add("compliancequest__SQX_Finding__c", f"{CQ}Title__c", fnd_cols,
+    [{f"{CQ}Title__c": r["Title (Seed Key)"], "RecordType.DeveloperName": "Audit_Finding", AUDR: r["Audit"],
+      f"{CQ}Finding_Type__c": r["Finding Type"], f"{CQ}Status__c": r["Status"], f"{CQ}SQX_Site__r.Name": r["Site"],
+      f"{CQ}SQX_Department__r.Name": r["Department"], f"{CQ}SQX_Supplier__r.{CQ}Supplier_Number__c": r["Supplier"],
+      f"{CQ}Issue_Date__c": str(r["Issue Date"])[:10], f"{CQ}Due_Date__c": str(r["Due Date"])[:10],
+      f"{CQ}Description__c": r["Description"]} for r in rows("Audit Findings")],
+    query_fields=[f"{CQ}Title__c", "RecordTypeId", f"{CQ}SQX_Audit__c"] +
+                 [c.replace("__r.Name", "__c").replace(f"__r.{CQ}Supplier_Number__c", "__c") for c in fnd_cols[3:]])
+
 # ---------- Source Ids ----------
 # SFDMU did not resolve the "<Lookup>__r.<ExternalId>" columns on their own (every lookup and record type
 # came through blank), so the CSVs are written the way SFDMU itself exports them: an Id column with a
@@ -314,6 +383,8 @@ PARENT = {  # relationship name (without namespace) -> parent object
     "SQX_Complaint_Code__r": "SQX_Defect_Code__c", "SQX_Result_Type__r": "SQX_Result_Type__c",
     "SQX_Task__r": "SQX_Task__c", "SQX_Nonconformance__r": "SQX_Nonconformance__c",
     "SQX_Complaint__r": "SQX_Complaint__c",
+    "SQX_Controlled_Document__r": "SQX_Controlled_Document__c", "SQX_Audit_Criteria_Document__r": "SQX_Controlled_Document__c",
+    "SQX_Audit_Program__r": "SQX_Audit_Program__c", "SQX_Audit__r": "SQX_Audit__c", "Account__r": "Account",
 }
 
 
