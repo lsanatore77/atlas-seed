@@ -71,8 +71,10 @@ Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks
 - 15 Atlas documents from the **Controlled Documents** tab: 8 SOPs, 4 work instructions and 3 inspection criteria
   (`Inspection_Criteria` record type), plus the 2 audit criteria documents. Released ones load as **Current**;
   WI-TST-040 is a new document still in **Draft**. Revisions are left to change orders (CQ's Revise action).
-- **Files** are one-page PDFs in `files\`, one per document, named by document number. `build_document_files.py`
-  writes them from the workbook and the text inside it.
+- **Files** are one-page Word documents in `files\`, one per document, named by document number. Word, because a
+  controlled document's Primary Content is its editable source (a PDF would be the Secondary rendition).
+  `build_document_files.py` holds the text and runs `scripts\make-docx.js` (docx-js keeps each file about 12 KB, so
+  the link script can send it in one Apex run).
 - **`link-document-files.ps1`** uploads each file and links it the way CQ does: the file goes into the document's
   library (Release for Current, Draft for Draft) with its Controlled Document field set, it's linked to the
   document, and the document's Primary Content is set to it. If the library refuses the upload, the file is published

@@ -1,4 +1,6 @@
-"""Build the Atlas controlled document files (one short PDF per document) into files/.
+"""Build the Atlas controlled document files (one short Word document per document) into files/.
+
+Word, because a controlled document's Primary Content is its editable source; a PDF would be the Secondary rendition.
 
 The document list matches the Controlled Documents tab of the review workbook (number, title,
 revision, status, effective date). link-document-files.ps1 uploads them after the seed load and
@@ -6,17 +8,9 @@ sets each document's Primary Content. Atlas Manufacturing is fictional; this is 
 """
 import os
 from openpyxl import load_workbook
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle, KeepTogether
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "files")
-NAVY = colors.HexColor("#1F3A5F")
-GREY = colors.HexColor("#5A6470")
-LINE = colors.HexColor("#C9D1DB")
 
 # ---------- content ----------
 # Each document: list of sections. A section is (heading, [paragraphs]) or (heading, {"table": [...rows]})
@@ -218,74 +212,26 @@ C = {
 ],
 }
 
-# ---------- layout ----------
-ST = {
-    "co": ParagraphStyle("co", fontName="Helvetica-Bold", fontSize=9, textColor=colors.white, leading=11),
-    "coR": ParagraphStyle("coR", fontName="Helvetica-Bold", fontSize=9, textColor=colors.white, leading=11, alignment=2),
-    "title": ParagraphStyle("title", fontName="Helvetica-Bold", fontSize=14, textColor=NAVY, leading=17),
-    "meta": ParagraphStyle("meta", fontName="Helvetica", fontSize=8.5, textColor=GREY, leading=11),
-    "h": ParagraphStyle("h", fontName="Helvetica-Bold", fontSize=10.5, textColor=NAVY, spaceBefore=8, spaceAfter=3, leading=13),
-    "p": ParagraphStyle("p", fontName="Helvetica", fontSize=9.5, leading=12.5),
-    "cell": ParagraphStyle("cell", fontName="Helvetica", fontSize=9, leading=11.5),
-    "cellb": ParagraphStyle("cellb", fontName="Helvetica-Bold", fontSize=9, leading=11.5, textColor=colors.white),
-}
+# ---------- build ----------
+# The Word files are written by scripts/make-docx.js (docx-js keeps them small, about 10 KB, so
+# link-document-files.ps1 can send each one in a single Apex run). This script supplies the text.
+import json, subprocess, tempfile
 
 
-def footer(draft):
-    def draw(canvas, doc):
-        canvas.saveState()
-        canvas.setFont("Helvetica", 7.5)
-        canvas.setFillColor(GREY)
-        canvas.drawString(0.75 * inch, 0.5 * inch,
-                          "Atlas Manufacturing is a fictional company (test data). Uncontrolled when printed: check CQ for the current revision.")
-        canvas.drawRightString(7.75 * inch, 0.5 * inch, f"Page {doc.page}")
-        if draft:
-            canvas.setFont("Helvetica-Bold", 90)
-            canvas.setFillColor(colors.Color(0.85, 0.2, 0.2, alpha=0.12))
-            canvas.translate(4.25 * inch, 5.5 * inch)
-            canvas.rotate(35)
-            canvas.drawCentredString(0, 0, "DRAFT")
-        canvas.restoreState()
-    return draw
-
-
-def build(meta, sections, path):
-    num, title, rtype, status, rev, eff = meta
-    story = []
-    head = Table([[Paragraph("ATLAS MANUFACTURING", ST["co"]), Paragraph(f"{rtype}", ST["coR"])]],
-                 colWidths=[3.5 * inch, 3.5 * inch])
-    head.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), NAVY), ("ALIGN", (1, 0), (1, 0), "RIGHT"),
-                              ("TOPPADDING", (0, 0), (-1, -1), 5), ("BOTTOMPADDING", (0, 0), (-1, -1), 5)]))
-    story += [head, Spacer(1, 8), Paragraph(f"{num}  {title}", ST["title"]), Spacer(1, 3),
-              Paragraph(f"Revision {rev} &nbsp;·&nbsp; Status: {status} &nbsp;·&nbsp; Effective: {eff or 'not yet released'}", ST["meta"]),
-              Spacer(1, 4)]
-    for heading, body in sections:
-        block = [Paragraph(heading, ST["h"])]
+def spec(meta, sections):
+    num, title, rtype, status, rev, eff, fname = meta
+    out = []
+    for i, (heading, body) in enumerate(sections):
+        s = {"id": i, "heading": heading}
         if isinstance(body, list):
-            block += [Paragraph(t, ST["p"]) for t in body]
+            s["paragraphs"] = body
         elif "steps" in body:
-            rows = [[Paragraph(f"{i}.", ST["cell"]), Paragraph(s, ST["cell"])] for i, s in enumerate(body["steps"], 1)]
-            t = Table(rows, colWidths=[0.3 * inch, 6.7 * inch])
-            t.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
-                                   ("TOPPADDING", (0, 0), (-1, -1), 1), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
-            block.append(t)
+            s["steps"] = body["steps"]
         else:
-            data = [[Paragraph(c, ST["cellb"] if r == 0 else ST["cell"]) for c in row] for r, row in enumerate(body["table"])]
-            t = Table(data, colWidths=[2.1 * inch, 2.1 * inch, 2.8 * inch], repeatRows=1)
-            t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, 0), NAVY), ("GRID", (0, 0), (-1, -1), 0.5, LINE),
-                                   ("VALIGN", (0, 0), (-1, -1), "TOP")]))
-            block.append(t)
-        story.append(KeepTogether(block))
-    hist = [["Rev", "Date", "Change"]] + ([[rev, eff, "Current release."]] if eff else [[rev, "", "New document, in draft."]])
-    ht = Table([[Paragraph(c, ST["cellb"] if r == 0 else ST["cell"]) for c in row] for r, row in enumerate(hist)],
-               colWidths=[0.6 * inch, 1.1 * inch, 5.3 * inch])
-    ht.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, 0), NAVY), ("GRID", (0, 0), (-1, -1), 0.5, LINE)]))
-    story += [KeepTogether([Paragraph("Revision history", ST["h"]), ht])]
-    doc = SimpleDocTemplate(path, pagesize=letter, leftMargin=0.75 * inch, rightMargin=0.75 * inch,
-                            topMargin=0.6 * inch, bottomMargin=0.8 * inch, title=f"{num} {title}",
-                            author="Atlas Manufacturing (test data)", pageCompression=1)
-    draw = footer(status == "Draft")
-    doc.build(story, onFirstPage=draw, onLaterPages=draw)
+            s["table"] = body["table"]
+        out.append(s)
+    return {"number": num, "title": title, "recordType": rtype, "status": status, "revision": rev,
+            "effective": eff, "file": fname, "sections": out}
 
 
 def main():
@@ -293,7 +239,7 @@ def main():
     ws = wb["Controlled Documents"]
     hdr = [c.value for c in ws[3]]
     os.makedirs(OUT, exist_ok=True)
-    made = []
+    specs = []
     for r in ws.iter_rows(min_row=4, values_only=True):
         if all(v is None for v in r):
             continue
@@ -301,14 +247,22 @@ def main():
         num = d["Document Number (Seed Key)"]
         if num not in C:
             raise SystemExit(f"No content written for {num}")
-        eff = d["Effective Date"] or ""
-        meta = (num, d["Title"], d["Record Type"], d["Document Status"], d["Revision"], str(eff)[:10])
-        path = os.path.join(OUT, d["File"] or f"{num}.pdf")
-        build(meta, C[num], path)
-        made.append((num, os.path.getsize(path)))
-    for num, size in made:
-        print(f"{num}: {size} bytes")
-    print(f"{len(made)} files in {OUT}")
+        eff = str(d["Effective Date"] or "")[:10]
+        specs.append(spec((num, d["Title"], d["Record Type"], d["Document Status"], d["Revision"], eff,
+                           d["File"] or f"{num}.docx"), C[num]))
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+        json.dump(specs, f)
+    subprocess.run(["node", os.path.join(HERE, "scripts", "make-docx.js"), f.name, OUT], check=True)
+    os.remove(f.name)
+    # Drop the zip's folder entries: Word has refused files that have them when opened through online editors.
+    import zipfile
+    for sp in specs:
+        fp = os.path.join(OUT, sp["file"])
+        with zipfile.ZipFile(fp) as z:
+            items = [(i, z.read(i.filename)) for i in z.infolist() if not i.filename.endswith("/")]
+        with zipfile.ZipFile(fp, "w", zipfile.ZIP_DEFLATED) as z:
+            for i, data in items:
+                z.writestr(i, data)
 
 
 if __name__ == "__main__":
