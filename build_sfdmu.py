@@ -281,29 +281,6 @@ add("compliancequest__SQX_Complaint_Defect__c", f"{CR};{CQ}SQX_Defect_Code__r.Na
     query_fields=[f"{CQ}SQX_Complaint__c", f"{CQ}SQX_Defect_Code__c", f"{CQ}SQX_Part__c", f"{CQ}Lot_Ser_Number__c",
                   f"{CQ}Defective_Quantity__c"])
 
-inv_cols = [CR, "RecordType.DeveloperName", f"{CQ}SQX_Part__r.{CQ}Part_Number__c", f"{CQ}SQX_Part_Family__r.Name",
-            f"{CQ}Lot_Number__c", f"{CQ}Type_of_Investigation__c", f"{CQ}Status__c", f"{CQ}Record_Stage__c",
-            f"{CQ}Investigation_Summary__c"]
-invs = []
-for r in rows("Complaint Investigations"):
-    p, lot = cmp_part[r["Complaint (Title)"]]
-    invs.append({CR: r["Complaint (Title)"], "RecordType.DeveloperName": "Complaint_Investigation",
-                 f"{CQ}SQX_Part__r.{CQ}Part_Number__c": p, f"{CQ}SQX_Part_Family__r.Name": part_family[p],
-                 f"{CQ}Lot_Number__c": lot, f"{CQ}Type_of_Investigation__c": "Complaint Investigation",
-                 f"{CQ}Status__c": "Draft", f"{CQ}Record_Stage__c": "Draft",
-                 f"{CQ}Investigation_Summary__c": r["Investigation Summary"]})
-add("compliancequest__SQX_Investigation__c", CR, inv_cols, invs,
-    query_fields=[f"{CQ}SQX_Complaint__c", "RecordTypeId", f"{CQ}SQX_Part__c", f"{CQ}SQX_Part_Family__c",
-                  f"{CQ}Lot_Number__c", f"{CQ}Type_of_Investigation__c", f"{CQ}Status__c", f"{CQ}Record_Stage__c",
-                  f"{CQ}Investigation_Summary__c"])
-
-phr_cols = [CR, f"{CQ}SQX_Task__r.Name", f"{CQ}Status__c", f"{CQ}Product_History_Review_Summary__c"]
-add("compliancequest__SQX_Product_History_Review__c", CR, phr_cols,
-    [{CR: r["Complaint (Title)"], f"{CQ}SQX_Task__r.Name": "Atlas Drone Lot History Review", f"{CQ}Status__c": "Draft",
-      f"{CQ}Product_History_Review_Summary__c": r["Summary"]} for r in rows("Product History Reviews")],
-    query_fields=[f"{CQ}SQX_Complaint__c", f"{CQ}SQX_Task__c", f"{CQ}Status__c", f"{CQ}Product_History_Review_Summary__c"])
-
-
 # ---------- Audits ----------
 DOCR = f"{CQ}SQX_Controlled_Document__r.{CQ}Document_Number__c"
 CRITR = f"{CQ}SQX_Audit_Criteria_Document__r.{CQ}Document_Number__c"
@@ -378,21 +355,9 @@ add("compliancequest__SQX_Audit__c", f"{CQ}Title__c", aud_cols,
     query_fields=[c.replace("__r.Name", "__c").replace(f"__r.{CQ}Supplier_Number__c", "__c")
                   .replace(f"__r.{CQ}Title__c", "__c").replace(f"__r.{CQ}Document_Number__c", "__c") for c in aud_cols])
 
-fnd_cols = [f"{CQ}Title__c", "RecordType.DeveloperName", AUDR, f"{CQ}Finding_Type__c", f"{CQ}Status__c",
-            f"{CQ}SQX_Site__r.Name", f"{CQ}SQX_Department__r.Name", f"{CQ}SQX_Supplier__r.{CQ}Supplier_Number__c",
-            f"{CQ}Issue_Date__c", f"{CQ}Due_Date__c", f"{CQ}Description__c"]
-add("compliancequest__SQX_Finding__c", f"{CQ}Title__c", fnd_cols,
-    [{f"{CQ}Title__c": r["Title (Seed Key)"], "RecordType.DeveloperName": "Audit_Finding", AUDR: r["Audit"],
-      f"{CQ}Finding_Type__c": r["Finding Type"], f"{CQ}Status__c": r["Status"], f"{CQ}SQX_Site__r.Name": r["Site"],
-      f"{CQ}SQX_Department__r.Name": r["Department"], f"{CQ}SQX_Supplier__r.{CQ}Supplier_Number__c": r["Supplier"],
-      f"{CQ}Issue_Date__c": str(r["Issue Date"])[:10], f"{CQ}Due_Date__c": str(r["Due Date"])[:10],
-      f"{CQ}Description__c": r["Description"]} for r in rows("Audit Findings")],
-    query_fields=[f"{CQ}Title__c", "RecordTypeId", f"{CQ}SQX_Audit__c"] +
-                 [c.replace("__r.Name", "__c").replace(f"__r.{CQ}Supplier_Number__c", "__c") for c in fnd_cols[3:]])
-
 # ---------- Equipment ----------
 # Equipment number (Name) is the key. Calibration status is carried on the equipment (Last/Next Calibration
-# Date); calibrations load as Open (the starting point: CQ closes them with a sign-off). Procedures point at Controlled Documents.
+# Date). No calibration records are loaded: they get added in CQ. Procedures point at Controlled Documents.
 EQR = f"{CQ}SQX_Equipment__r.Name"
 eq_cols = ["Name", f"{CQ}Equipment_Description__c", f"{CQ}Equipment_Type__c", f"{CQ}Equipment_Status__c",
            f"{CQ}Manufacturer__c", f"{CQ}Model_Number__c", f"{CQ}Serial_Number__c", f"{CQ}Equipment_Location__c",
@@ -425,33 +390,6 @@ add("compliancequest__SQX_Equipment__c", "Name", eq_cols,
                   f"{CQ}Requires_Periodic_Calibration__c", f"{CQ}Calibration_Interval__c", f"{CQ}Calibration_Source__c",
                   f"{CQ}SQX_Calibration_Supplier__c", f"{CQ}Last_Calibration_Date__c", f"{CQ}Next_Calibration_Date__c",
                   f"{CQ}SQX_Applicable_Procedure_Rev__c"])
-
-cal_cols = [EQR, f"{CQ}Calibration_Date__c", f"{CQ}Performed_By__c", f"{CQ}SQX_Calibration_Supplier__r.Name",
-            f"{CQ}Calibration_Certificate_Number__c", f"{CQ}Initial_Calibration_Result__c", f"{CQ}Final_Calibration_Result__c",
-            f"{CQ}Adjustment_Made__c", f"{CQ}Next_Calibration_Date__c", f"{CQ}Calibration_Status__c", f"{CQ}Calibration_Comments__c",
-            f"{CQ}Sign_Off_By__c", f"{CQ}Sign_Off_Date__c", f"{CQ}Sign_Off_Comment__c"]
-
-
-def signoff_dt(v):
-    # Sign-Off Date is a date-time; the sheet holds a date. Noon Central (18:00 UTC) keeps it on that date in US time zones.
-    return f"{str(v)[:10]}T18:00:00.000Z" if v else ""
-
-
-add("compliancequest__SQX_Calibration__c", f"{EQR};{CQ}Calibration_Date__c", cal_cols,
-    [{EQR: r["Equipment (Seed Key)"], f"{CQ}Calibration_Date__c": d10(r["Calibration Date"]),
-      f"{CQ}Performed_By__c": r["Performed By"], f"{CQ}SQX_Calibration_Supplier__r.Name": r["Calibration Lab (Account)"],
-      f"{CQ}Calibration_Certificate_Number__c": r["Certificate Number"],
-      f"{CQ}Initial_Calibration_Result__c": r["Initial Result"], f"{CQ}Final_Calibration_Result__c": r["Final Result"],
-      f"{CQ}Adjustment_Made__c": tf(r["Adjustment Made"]), f"{CQ}Next_Calibration_Date__c": d10(r["Next Calibration Date"]),
-      f"{CQ}Calibration_Status__c": r["Calibration Status"], f"{CQ}Calibration_Comments__c": r["Comments"],
-      f"{CQ}Sign_Off_By__c": r["Sign-Off By"], f"{CQ}Sign_Off_Date__c": signoff_dt(r["Sign-Off Date"]),
-      f"{CQ}Sign_Off_Comment__c": r["Sign-Off Comment"]}
-     for r in rows("Calibrations")],
-    query_fields=[f"{CQ}SQX_Equipment__c", f"{CQ}Calibration_Date__c", f"{CQ}Performed_By__c", f"{CQ}SQX_Calibration_Supplier__c",
-                  f"{CQ}Calibration_Certificate_Number__c", f"{CQ}Initial_Calibration_Result__c",
-                  f"{CQ}Final_Calibration_Result__c", f"{CQ}Adjustment_Made__c", f"{CQ}Next_Calibration_Date__c",
-                  f"{CQ}Calibration_Status__c", f"{CQ}Calibration_Comments__c",
-                  f"{CQ}Sign_Off_By__c", f"{CQ}Sign_Off_Date__c", f"{CQ}Sign_Off_Comment__c"])
 
 sch_cols = [EQR, f"{CQ}Uniqueness_Constraint__c", f"{CQ}Active__c", f"{CQ}Recurring_Event__c", f"{CQ}Recurring_Interval__c",
             f"{CQ}Recurring_Unit__c", f"{CQ}Schedule_Basis__c", f"{CQ}Last_Performed_Date__c", f"{CQ}Next_Due_Date__c",

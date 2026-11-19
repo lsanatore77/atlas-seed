@@ -2,9 +2,9 @@
 
 Fictional, non-regulated drone maker. ~5 records per object.
 
-**Starting point rule:** every record with a workflow (NCs, complaints, audits, inspections, calibrations, and later
-CAPAs, changes, training) loads at its first status (Draft, or Open where CQ starts there) and is moved forward in CQ
-by hand or by automation. Reference data (released SOPs and work instructions, parts, suppliers, equipment) loads ready to use.
+**Starting point rule:** every record with a workflow (NCs, complaints, audits, inspections, and later CAPAs, changes,
+training) loads at its first status (Draft, or Open where CQ starts there) and is moved forward in CQ by hand or by
+automation. Records CQ's workflow creates along the way (investigations, PHRs, findings, checklists) are not loaded. Reference data (released SOPs and work instructions, parts, suppliers, equipment) loads ready to use.
 Built from `Atlas_Manufacturing_Dev_Seed_Data.xlsx`. Field names checked against the dev sandbox (CQ 16.0) on 2026-11-09.
 
 ## Load into a scratch org
@@ -55,14 +55,13 @@ Only for a scratch org loaded before 2026-11-19 (IC-REC documents loaded as Curr
 inspections, the three IC-REC documents with their files and the Closed ATL-EQ-001 calibration, so they reload
 at their starting point.
 
-## What loads (37 objects, 171 records)
+## What loads (33 objects, 159 records)
 
 Divisions, Business Unit, Sites, Departments, Processes, Accounts, Contacts, Suppliers, Supplier Contacts, Personnel,
 Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks (PHR task + 5 Questions, Investigation task),
 5 Nonconformances (+ Impacted Products, Defects, Containments), 5 Complaints (+ Defects),
-2 Complaint Investigations, 2 Product History Reviews,
-15 Controlled Documents (SOPs, work instructions, inspection criteria), 2 Audit Criteria documents (+ 8 Requirements), 1 Audit Program (+ 2 Scopes), 3 Audits, 3 Audit Findings,
-6 Equipment (+ 5 Calibrations, 2 Schedules), 10 Specifications on the 3 Draft Inspection Criteria, 4 Inspections (Draft, no criteria or detail lines yet).
+15 Controlled Documents (SOPs, work instructions, inspection criteria), 2 Audit Criteria documents (+ 8 Requirements), 1 Audit Program (+ 2 Scopes), 3 Audits,
+6 Equipment (+ 2 Schedules), 10 Specifications on the 3 Draft Inspection Criteria, 4 Inspections (Draft, no criteria or detail lines yet).
 
 ## Choices made when converting from the spreadsheet
 
@@ -80,7 +79,9 @@ Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks
 - **Supplier accounts** use the `CQ_Supplier` record type (what CQ's supplier rules expect); customers use `Default`.
 - **Business Unit → Site:** both sites sit under the Atlas Manufacturing BU. NCs and complaints carry
   Division by site (Houston = Consumer Drones, Piscataway = Commercial Drones).
-- **PHRs** link to the complaint and the Atlas PHR task, not to the investigation.
+- **Not loaded on purpose:** investigations, Product History Reviews and audit findings (CQ's workflow creates them as
+  the complaint or audit moves forward; the Atlas CQ Tasks drive the complaint steps), inspection detail lines, and
+  calibration records (easier to add in CQ when needed).
   CQ builds PHR checklists when a PHR is created from the complaint's PHR step; a loaded PHR may not get them.
 
 ## Controlled Documents
