@@ -9,14 +9,26 @@ Run from this folder (the one containing `data` and `config`):
 
 ```
 sf org create scratch --definition-file config\cq16-snapshot-def.json --alias atlas-seed --duration-days 7 --target-dev-hub golden --no-namespace --wait 30
-sf org assign permset --name compliancequest__CQ_Migration_User --target-org atlas-seed
+powershell -ExecutionPolicy Bypass -File .\grant-cq-access.ps1 -Org atlas-seed
 sf sfdmu run --sourceusername csvfile --targetusername atlas-seed --path data --noprompt
 ```
 
-`CQ_Migration_User` gives the load user CQ's data-migration permission, which CQ's own validation rules
-check for and skip. It's labelled CAUTION in CQ: fine in a scratch org, remove it afterwards in any real org.
+`grant-cq-access.ps1` sets up the load user (the scratch org's admin) in one step:
 
-Results and errors land in `data\target` and `data\logs`.
+1. Builds a permission set, `Atlas_Seed_Record_Types`, that makes every active CQ record type in that org
+   visible, and deploys it. Without this, records that name a CQ record type fail with "invalid record type".
+2. Assigns that permission set plus **every** CQ permission set and permission set group
+   (`compliancequest`, `cqext`, `cqcollab`) to the load user. Anything already assigned is skipped, and any
+   that Salesforce refuses (for example, one needing a licence the user lacks) is listed rather than stopping the run.
+
+Everything includes `CQ_Migration_User`, which CQ's validation rules check for and skip. It's labelled CAUTION
+in CQ, so the script stops on any org that doesn't look like a scratch org unless you add `-NotScratchOk`.
+In a real sandbox, grant record type access and permissions the normal way instead.
+
+If your PowerShell policy blocks the script, run its steps by hand: deploy `force-app` after generating the
+permission set, then `sf apex run --file scripts\assign-cq-access.apex --target-org atlas-seed`.
+
+Results and errors from the load land in `data\target` and `data\logs`.
 
 ## What loads (32 objects, 128 records)
 
@@ -48,8 +60,7 @@ Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks
 - **Audit checklists are not loaded.** CQ copies the criteria's requirements into the checklist as the audit moves on.
 - **Audits use the org's default record type.** "Standard Audit" in the dev sandbox was created in that org, not by CQ.
 - **Lead Auditor and Auditee Contact are blank** (users differ per org); fill them in when you work the audit.
-- Record types the load user's profile needs: Audit_Criteria (Controlled Document) and Audit_Finding (Finding),
-  on top of the ones listed in `data/RecordType.csv`.
+- Record types: `grant-cq-access.ps1` makes every CQ record type visible, including Audit_Criteria and Audit_Finding.
 
 ## Rebuild
 
