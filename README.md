@@ -58,7 +58,7 @@ at their starting point.
 ## What loads (46 objects, 196 records)
 
 Divisions, Business Unit, Sites, Departments, Processes, Accounts, Contacts, Suppliers, Supplier Contacts, Personnel,
-Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks (PHR task + 5 Questions, Investigation task),
+Part Families, Parts, Lot Info, Hierarchical Codes, Cause Codes (5, with their categories and sub-categories), Yes/No Result Type, CQ Tasks (PHR task + 5 Questions, Investigation task),
 5 Nonconformances (+ Impacted Products, Defects, Containments), 5 Complaints (+ Defects),
 15 Controlled Documents (SOPs, work instructions, inspection criteria), 2 Audit Criteria documents (+ 8 Requirements), 1 Audit Program (+ 2 Scopes), 3 Audits,
 6 Equipment (+ 2 Schedules), 10 Specifications on the 3 Draft Inspection Criteria, 4 Inspections (Draft, no criteria or detail lines yet),

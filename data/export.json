@@ -81,6 +81,21 @@
       "externalId": "Name"
     },
     {
+      "query": "SELECT Id, Name, compliancequest__Description__c FROM compliancequest__SQX_Root_Cause_Category__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__SQX_Root_Cause_Category__c, compliancequest__Description__c FROM compliancequest__SQX_Root_Cause_Sub_Category__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__SQX_Root_Cause_Sub_Category__c, compliancequest__Description__c FROM compliancequest__SQX_Root_Cause_Code__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
       "query": "SELECT Id, Name FROM compliancequest__SQX_Result_Type__c",
       "operation": "Upsert",
       "externalId": "Name"

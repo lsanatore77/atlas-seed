@@ -156,6 +156,24 @@ add("compliancequest__SQX_Defect_Code__c", "Name",
                   f"{CQ}Description__c"])
 
 # ---------- PHR configuration ----------
+# Cause codes: a small root cause library (Category -> Sub-Category -> Code), one code per Atlas NC. Reference data.
+cause_rows = rows("Cause Codes")
+cats, subs = {}, {}
+for r in cause_rows:
+    cats.setdefault(r["Cause Category"], r["Category Description"])
+    subs.setdefault(r["Cause Sub-Category"], (r["Cause Category"], r["Sub-Category Description"]))
+add("compliancequest__SQX_Root_Cause_Category__c", "Name", ["Name", f"{CQ}Description__c"],
+    [{"Name": k, f"{CQ}Description__c": v} for k, v in cats.items()])
+RCCAT = f"{CQ}SQX_Root_Cause_Category__r.Name"
+add("compliancequest__SQX_Root_Cause_Sub_Category__c", "Name", ["Name", RCCAT, f"{CQ}Description__c"],
+    [{"Name": k, RCCAT: c, f"{CQ}Description__c": d} for k, (c, d) in subs.items()],
+    query_fields=["Name", f"{CQ}SQX_Root_Cause_Category__c", f"{CQ}Description__c"])
+RCSUB = f"{CQ}SQX_Root_Cause_Sub_Category__r.Name"
+add("compliancequest__SQX_Root_Cause_Code__c", "Name", ["Name", RCSUB, f"{CQ}Description__c"],
+    [{"Name": r["Cause Code (Seed Key)"], RCSUB: r["Cause Sub-Category"], f"{CQ}Description__c": r["Code Description"]}
+     for r in cause_rows],
+    query_fields=["Name", f"{CQ}SQX_Root_Cause_Sub_Category__c", f"{CQ}Description__c"])
+
 add("compliancequest__SQX_Result_Type__c", "Name", ["Name"], [{"Name": "Yes/No"}])
 rtv_cols = ["Name", f"{CQ}SQX_Result_Type__r.Name", "cqext__Response_Label__c", "cqext__Response_Value__c",
             f"{CQ}Color__c", "cqext__Language__c"]
@@ -591,7 +609,8 @@ PARENT = {  # relationship name (without namespace) -> parent object
     "SQX_Inspection_Criteria__r": "SQX_Controlled_Document__c", "SQX_Supplier_Number__r": "Account",
     "SQX_NC_Number__r": "SQX_Nonconformance__c", "Part__r": "SQX_Part__c",
     "SQX_Job_Function__r": "SQX_Job_Function__c", "SQX_Personnel__r": "SQX_Personnel__c",
-    "SQX_Process__r": "SQX_Standard_Service__c",
+    "SQX_Process__r": "SQX_Standard_Service__c", "SQX_Root_Cause_Category__r": "SQX_Root_Cause_Category__c",
+    "SQX_Root_Cause_Sub_Category__r": "SQX_Root_Cause_Sub_Category__c",
 }
 
 

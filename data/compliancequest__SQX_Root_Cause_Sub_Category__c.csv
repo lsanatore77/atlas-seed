@@ -1,0 +1,6 @@
+"Id","Name","compliancequest__SQX_Root_Cause_Category__c","compliancequest__SQX_Root_Cause_Category__r.Name","compliancequest__Description__c"
+"S16000000000000001","Supplier Material","S15000000000000001","Material","Incoming material or component nonconformities."
+"S16000000000000002","Gauging","S15000000000000002","Measurement","Measurement and torque tools and their calibration."
+"S16000000000000003","Equipment","S15000000000000003","Machine","Production equipment set-up and performance."
+"S16000000000000004","Process Design","S15000000000000004","Method","Gaps in how the process or its controls were designed."
+"S16000000000000005","Human Error","S15000000000000005","Man (People)","Unintentional mistakes made while performing a task."

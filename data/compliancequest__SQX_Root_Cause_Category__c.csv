@@ -1,0 +1,6 @@
+"Id","Name","compliancequest__Description__c"
+"S15000000000000001","Material","Causes related to incoming material and components."
+"S15000000000000002","Measurement","Causes related to gauges, tools, inspection and test methods."
+"S15000000000000003","Machine","Causes related to equipment, tooling and fixtures."
+"S15000000000000004","Method","Causes related to procedures, work instructions and process design."
+"S15000000000000005","Man (People)","Causes related to people: training, skills and human error."

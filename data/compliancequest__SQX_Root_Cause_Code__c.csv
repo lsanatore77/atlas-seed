@@ -1,0 +1,6 @@
+"Id","Name","compliancequest__SQX_Root_Cause_Sub_Category__c","compliancequest__SQX_Root_Cause_Sub_Category__r.Name","compliancequest__Description__c"
+"S17000000000000001","Supplier process change not notified","S16000000000000001","Supplier Material","Supplier changed a material, process or sub-supplier without telling Atlas."
+"S17000000000000002","Tool out of calibration","S16000000000000002","Gauging","Torque tool or gauge drifted out of tolerance between calibrations."
+"S17000000000000003","Reflow profile out of window","S16000000000000003","Equipment","Reflow oven temperature profile outside the solder paste window."
+"S17000000000000004","Label artwork not verified against BOM","S16000000000000004","Process Design","Label content was not checked against the bill of materials before printing."
+"S17000000000000005","Wrong firmware file selected","S16000000000000005","Human Error","Operator selected an incorrect firmware build for the board revision."
