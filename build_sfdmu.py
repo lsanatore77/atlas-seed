@@ -417,7 +417,7 @@ from zoneinfo import ZoneInfo
 
 def qf(cols):
     # query field for each column: a lookup's __r.<key> column queries the lookup's Id field
-    return [c.split(".")[0][:-3] + "__c" if "." in c and not c.startswith("RecordType.") else c for c in cols]
+    return ["RecordTypeId" if c.startswith("RecordType.") else c.split(".")[0][:-3] + "__c" if "." in c else c for c in cols]
 
 
 def central_dt(v):
@@ -467,6 +467,124 @@ add("compliancequest__SQX_Inspection__c", f"{CQ}Lot_Number__c", ins_cols,
      for r in rows("Inspections")],
     query_fields=qf(ins_cols))
 
+# ---------- Supplier records, CAPA, changes, training, risks, meetings, projects ----------
+# Every workflow record loads at its starting point (Draft). CQ names the supplier records itself unless
+# "Prevent Name Update" is set, so it is set to keep the seed's names (the Seed Key). Training requirements and
+# personnel job functions load inactive (CQ's default): activating them in CQ creates the document training.
+SUPN = f"{CQ}SQX_Supplier__r.{CQ}Supplier_Number__c"
+PARTN = f"{CQ}SQX_Part__r.{CQ}Part_Number__c"
+DRAFT = {f"{CQ}Status__c": "Draft", f"{CQ}Record_Stage__c": "Draft"}
+
+
+def add_q(sobject, key, cols, data, operation="Upsert"):
+    add(sobject, key, cols, data, query_fields=qf(cols), operation=operation)
+
+
+add_q("compliancequest__SQX_Supplier_Part__c", f"{CQ}Account__r.Name;{CQ}Part__r.{CQ}Part_Number__c",
+      [f"{CQ}Account__r.Name", f"{CQ}Part__r.{CQ}Part_Number__c", SUPN, f"{CQ}Supplier_Reference_Part_Number__c",
+       f"{CQ}Active__c", f"{CQ}Approved__c"],
+      [{f"{CQ}Account__r.Name": r["Supplier Account"], f"{CQ}Part__r.{CQ}Part_Number__c": r["Part"],
+        SUPN: r["Supplier Account"], f"{CQ}Supplier_Reference_Part_Number__c": r["Supplier Reference Part Number"],
+        f"{CQ}Active__c": tf(r["Active"]), f"{CQ}Approved__c": tf(r["Approved"])} for r in rows("Supplier Parts")])
+
+sd_cols = ["Name", f"{CQ}Prevent_Name_Update_Flag__c", SUPN, f"{CQ}SQX_Account__r.Name", PARTN, f"{CQ}Deviation_Category__c",
+           f"{CQ}Affected_Lots__c", f"{CQ}Affected_Quantities__c", f"{CQ}Effective_Date__c", f"{CQ}Expiration_Date__c",
+           f"{CQ}Reason_for_Deviation__c", f"{CQ}Scope__c", f"{CQ}Account_Type__c", f"{CQ}Status__c", f"{CQ}Record_Stage__c"]
+add_q("compliancequest__SQX_Supplier_Deviation__c", "Name", sd_cols,
+      [{"Name": r["Name (Seed Key)"], f"{CQ}Prevent_Name_Update_Flag__c": "TRUE", SUPN: r["Supplier"],
+        f"{CQ}SQX_Account__r.Name": account_of_supplier[r["Supplier"]], PARTN: r["Part"],
+        f"{CQ}Deviation_Category__c": r["Deviation Category"], f"{CQ}Affected_Lots__c": r["Affected Lots"],
+        f"{CQ}Affected_Quantities__c": r["Affected Quantity"], f"{CQ}Effective_Date__c": d10(r["Effective Date"]),
+        f"{CQ}Expiration_Date__c": d10(r["Expiration Date"]), f"{CQ}Reason_for_Deviation__c": r["Reason for Deviation"],
+        f"{CQ}Scope__c": r["Scope"], f"{CQ}Account_Type__c": "CQ_Supplier", **DRAFT} for r in rows("Supplier Deviations")])
+
+se_cols = ["Name", f"{CQ}Prevent_Name_Update__c", SUPN, f"{CQ}SQX_Account__r.Name", PARTN, f"{CQ}Subject__c",
+           f"{CQ}Escalation_Level__c", f"{CQ}Target_Escalation_Level__c", f"{CQ}Rationale_for_Escalation__c",
+           f"{CQ}Account_Type__c", f"{CQ}Status__c", f"{CQ}Record_Stage__c"]
+add_q("compliancequest__SQX_Supplier_Escalation__c", "Name", se_cols,
+      [{"Name": r["Name (Seed Key)"], f"{CQ}Prevent_Name_Update__c": "TRUE", SUPN: r["Supplier"],
+        f"{CQ}SQX_Account__r.Name": account_of_supplier[r["Supplier"]], PARTN: r["Part"], f"{CQ}Subject__c": r["Subject"],
+        f"{CQ}Escalation_Level__c": str(r["Escalation Level"]), f"{CQ}Target_Escalation_Level__c": str(r["Target Escalation Level"]),
+        f"{CQ}Rationale_for_Escalation__c": r["Rationale for Escalation"], f"{CQ}Account_Type__c": "CQ_Supplier", **DRAFT}
+       for r in rows("Supplier Escalations")])
+
+sq_cols = ["Name", f"{CQ}Prevent_Name_Update_Flag__c", f"{CQ}Company_Name__c", f"{CQ}Supplier_Name__c", f"{CQ}First_Name__c",
+           f"{CQ}Last_Name__c", f"{CQ}Job_Title__c", f"{CQ}Location__c", PARTN, f"{CQ}Justification_for_SI__c",
+           f"{CQ}Account_Type__c", f"{CQ}Status__c", f"{CQ}Record_Stage__c"]
+add_q("compliancequest__SQX_New_Supplier_Introduction__c", "Name", sq_cols,
+      [{"Name": r["Name (Seed Key)"], f"{CQ}Prevent_Name_Update_Flag__c": "TRUE", f"{CQ}Company_Name__c": r["Company Name"],
+        f"{CQ}Supplier_Name__c": r["Company Name"], f"{CQ}First_Name__c": r["Contact First Name"],
+        f"{CQ}Last_Name__c": r["Contact Last Name"], f"{CQ}Job_Title__c": r["Contact Job Title"],
+        f"{CQ}Location__c": r["Location"], PARTN: r["Part"], f"{CQ}Justification_for_SI__c": r["Justification"],
+        f"{CQ}Account_Type__c": "CQ_Supplier", **DRAFT} for r in rows("Supplier Qualifications")])
+
+si_cols = ["Name", f"{CQ}Prevent_Name_Update__c", SUPN, f"{CQ}SQX_Account__r.Name", PARTN, f"{CQ}Interaction_Reason__c",
+           f"{CQ}Renew_Due_Date__c", f"{CQ}Scope__c", f"{CQ}Account_Type__c", f"{CQ}Status__c", f"{CQ}Record_Stage__c"]
+add_q("compliancequest__SQX_Supplier_Interaction__c", "Name", si_cols,
+      [{"Name": r["Name (Seed Key)"], f"{CQ}Prevent_Name_Update__c": "TRUE", SUPN: r["Supplier"],
+        f"{CQ}SQX_Account__r.Name": account_of_supplier[r["Supplier"]], PARTN: r["Part"],
+        f"{CQ}Interaction_Reason__c": r["Interaction Reason"], f"{CQ}Renew_Due_Date__c": d10(r["Renew Due Date"]),
+        f"{CQ}Scope__c": r["Scope"], f"{CQ}Account_Type__c": "CQ_Supplier", **DRAFT} for r in rows("Supplier Interactions")])
+
+capa_cols = [f"{CQ}Title__c", "RecordType.DeveloperName", f"{CQ}CAPA_Type__c", SUPN, PARTN, f"{CQ}SQX_Site__r.Name",
+             f"{CQ}SQX_Division__r.Name", f"{CQ}SQX_Business_Unit__r.Name", f"{CQ}SQX_Department__r.Name", f"{CQ}Severity__c",
+             f"{CQ}Probability__c", f"{CQ}Target_Due_Date__c", f"{CQ}Description__c", f"{CQ}Status__c", f"{CQ}Record_Stage__c"]
+add_q("compliancequest__SQX_CAPA__c", f"{CQ}Title__c", capa_cols,
+      [{f"{CQ}Title__c": r["Title (Seed Key)"], "RecordType.DeveloperName": "CAPA", f"{CQ}CAPA_Type__c": r["CAPA Type"],
+        SUPN: r["Supplier"], PARTN: r["Part"], f"{CQ}SQX_Site__r.Name": r["Site"],
+        f"{CQ}SQX_Division__r.Name": site_division[r["Site"]], f"{CQ}SQX_Business_Unit__r.Name": "Atlas Manufacturing",
+        f"{CQ}SQX_Department__r.Name": r["Department"], f"{CQ}Severity__c": r["Severity"],
+        f"{CQ}Probability__c": r["Probability"], f"{CQ}Target_Due_Date__c": d10(r["Target Due Date"]),
+        f"{CQ}Description__c": r["Description"], **DRAFT} for r in rows("CAPAs")])
+
+cr_cols = [f"{CQ}Title__c", f"{CQ}Change_Category__c", f"{CQ}Priority__c", f"{CQ}SQX_Department__r.Name", PARTN,
+           f"{CQ}SQX_Process__r.Name", f"{CQ}Description__c", f"{CQ}Status__c", f"{CQ}Record_Stage__c"]
+add_q("compliancequest__SQX_Change_Request__c", f"{CQ}Title__c", cr_cols,
+      [{f"{CQ}Title__c": r["Title (Seed Key)"], f"{CQ}Change_Category__c": r["Change Category"], f"{CQ}Priority__c": r["Priority"],
+        f"{CQ}SQX_Department__r.Name": r["Department"], PARTN: r["Part"], f"{CQ}SQX_Process__r.Name": r["Process"],
+        f"{CQ}Description__c": r["Description"], **DRAFT} for r in rows("Change Requests")])
+
+add_q("compliancequest__SQX_Job_Function__c", "Name", ["Name", f"{CQ}Description__c", f"{CQ}Active__c"],
+      [{"Name": r["Name (Seed Key)"], f"{CQ}Description__c": r["Description"], f"{CQ}Active__c": "TRUE"}
+       for r in rows("Job Functions")])
+
+REQDOC = f"{CQ}SQX_Controlled_Document__r.{CQ}Document_Number__c"
+JFN = f"{CQ}SQX_Job_Function__r.Name"
+add_q("compliancequest__SQX_Requirement__c", f"{REQDOC};{JFN}",
+      [REQDOC, JFN, f"{CQ}Level_of_Competency__c", f"{CQ}Active__c", f"{CQ}Optional__c"],
+      [{REQDOC: r["Controlled Document (Number)"], JFN: r["Job Function"], f"{CQ}Level_of_Competency__c": r["Level of Competency"],
+        f"{CQ}Active__c": "FALSE", f"{CQ}Optional__c": "FALSE"} for r in rows("Training Requirements")])
+
+PERSN = f"{CQ}SQX_Personnel__r.{CQ}Identification_Number__c"
+add_q("compliancequest__SQX_Personnel_Job_Function__c", f"{PERSN};{JFN}", [PERSN, JFN, f"{CQ}Active__c"],
+      [{PERSN: r["Personnel (Identification Number)"], JFN: r["Job Function"], f"{CQ}Active__c": "FALSE"}
+       for r in rows("Personnel Job Functions")])
+
+risk_cols = [f"{CQ}Risk_Title__c", f"{CQ}Risk_Category__c", f"{CQ}Reported_Priority__c", f"{CQ}Identified_Date__c", PARTN,
+             f"{CQ}SQX_Process__r.Name", f"{CQ}SQX_Department__r.Name", SUPN, f"{CQ}Risk_Description__c",
+             f"{CQ}Status__c", f"{CQ}Record_Stage__c"]
+add_q("compliancequest__SQX_Risk__c", f"{CQ}Risk_Title__c", risk_cols,
+      [{f"{CQ}Risk_Title__c": r["Risk Title (Seed Key)"], f"{CQ}Risk_Category__c": r["Risk Category"],
+        f"{CQ}Reported_Priority__c": r["Reported Priority"], f"{CQ}Identified_Date__c": d10(r["Identified Date"]),
+        PARTN: r["Part"], f"{CQ}SQX_Process__r.Name": r["Process"], f"{CQ}SQX_Department__r.Name": r["Department"],
+        SUPN: r["Supplier"], f"{CQ}Risk_Description__c": r["Risk Description"], **DRAFT} for r in rows("Risks")])
+
+mtg_cols = [f"{CQ}Title__c", "RecordType.DeveloperName", f"{CQ}Meeting_Date__c", f"{CQ}Objective__c", f"{CQ}Agenda__c",
+            f"{CQ}Status__c", f"{CQ}Record_Stage__c"]
+add_q("compliancequest__SQX_Meeting__c", f"{CQ}Title__c", mtg_cols,
+      [{f"{CQ}Title__c": r["Title (Seed Key)"], "RecordType.DeveloperName": "Management_Review",
+        f"{CQ}Meeting_Date__c": d10(r["Meeting Date"]), f"{CQ}Objective__c": r["Objective"], f"{CQ}Agenda__c": r["Agenda"],
+        **DRAFT} for r in rows("Meetings")])
+
+prj_cols = [f"{CQ}Title__c", "RecordType.DeveloperName", "cqext__Project_Category__c", f"{CQ}SQX_Department__r.Name",
+            f"{CQ}Project_Start_Date__c", f"{CQ}Project_End_Date__c", f"{CQ}Description__c", f"{CQ}Status__c",
+            f"{CQ}Record_Stage__c"]
+add_q("compliancequest__SQX_Project__c", f"{CQ}Title__c", prj_cols,
+      [{f"{CQ}Title__c": r["Title (Seed Key)"], "RecordType.DeveloperName": "Default",
+        "cqext__Project_Category__c": r["Project Category"], f"{CQ}SQX_Department__r.Name": r["Department"],
+        f"{CQ}Project_Start_Date__c": d10(r["Project Start Date"]), f"{CQ}Project_End_Date__c": d10(r["Project End Date"]),
+        f"{CQ}Description__c": r["Description"], **DRAFT} for r in rows("Projects")])
+
 # ---------- Source Ids ----------
 # SFDMU did not resolve the "<Lookup>__r.<ExternalId>" columns on their own (every lookup and record type
 # came through blank), so the CSVs are written the way SFDMU itself exports them: an Id column with a
@@ -488,7 +606,9 @@ PARENT = {  # relationship name (without namespace) -> parent object
     "SQX_Equipment__r": "SQX_Equipment__c", "SQX_Calibration_Supplier__r": "Account",
     "SQX_Applicable_Procedure_Rev__r": "SQX_Controlled_Document__c", "SQX_Applicable_Procedure__r": "SQX_Controlled_Document__c",
     "SQX_Inspection_Criteria__r": "SQX_Controlled_Document__c", "SQX_Supplier_Number__r": "Account",
-    "SQX_NC_Number__r": "SQX_Nonconformance__c",
+    "SQX_NC_Number__r": "SQX_Nonconformance__c", "Part__r": "SQX_Part__c",
+    "SQX_Job_Function__r": "SQX_Job_Function__c", "SQX_Personnel__r": "SQX_Personnel__c",
+    "SQX_Process__r": "SQX_Standard_Service__c",
 }
 
 

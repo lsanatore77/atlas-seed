@@ -174,6 +174,71 @@
       "query": "SELECT Id, compliancequest__Lot_Number__c, compliancequest__SQX_Part__c, compliancequest__SQX_Supplier__c, compliancequest__SQX_Supplier_Number__c, compliancequest__Inspection_Source__c, compliancequest__Inspection_Type__c, compliancequest__SQX_Department__c, compliancequest__Lot_Quantity__c, compliancequest__Sample_Size__c, compliancequest__Status__c, compliancequest__Initiated_Date_Time__c, compliancequest__SQX_NC_Number__c, compliancequest__Create_NC_If_Inspection_Fails__c, compliancequest__Comment__c FROM compliancequest__SQX_Inspection__c",
       "operation": "Upsert",
       "externalId": "compliancequest__Lot_Number__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Account__c, compliancequest__Part__c, compliancequest__SQX_Supplier__c, compliancequest__Supplier_Reference_Part_Number__c, compliancequest__Active__c, compliancequest__Approved__c FROM compliancequest__SQX_Supplier_Part__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Account__r.Name;compliancequest__Part__r.compliancequest__Part_Number__c"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__Prevent_Name_Update_Flag__c, compliancequest__SQX_Supplier__c, compliancequest__SQX_Account__c, compliancequest__SQX_Part__c, compliancequest__Deviation_Category__c, compliancequest__Affected_Lots__c, compliancequest__Affected_Quantities__c, compliancequest__Effective_Date__c, compliancequest__Expiration_Date__c, compliancequest__Reason_for_Deviation__c, compliancequest__Scope__c, compliancequest__Account_Type__c, compliancequest__Status__c, compliancequest__Record_Stage__c FROM compliancequest__SQX_Supplier_Deviation__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__Prevent_Name_Update__c, compliancequest__SQX_Supplier__c, compliancequest__SQX_Account__c, compliancequest__SQX_Part__c, compliancequest__Subject__c, compliancequest__Escalation_Level__c, compliancequest__Target_Escalation_Level__c, compliancequest__Rationale_for_Escalation__c, compliancequest__Account_Type__c, compliancequest__Status__c, compliancequest__Record_Stage__c FROM compliancequest__SQX_Supplier_Escalation__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__Prevent_Name_Update_Flag__c, compliancequest__Company_Name__c, compliancequest__Supplier_Name__c, compliancequest__First_Name__c, compliancequest__Last_Name__c, compliancequest__Job_Title__c, compliancequest__Location__c, compliancequest__SQX_Part__c, compliancequest__Justification_for_SI__c, compliancequest__Account_Type__c, compliancequest__Status__c, compliancequest__Record_Stage__c FROM compliancequest__SQX_New_Supplier_Introduction__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__Prevent_Name_Update__c, compliancequest__SQX_Supplier__c, compliancequest__SQX_Account__c, compliancequest__SQX_Part__c, compliancequest__Interaction_Reason__c, compliancequest__Renew_Due_Date__c, compliancequest__Scope__c, compliancequest__Account_Type__c, compliancequest__Status__c, compliancequest__Record_Stage__c FROM compliancequest__SQX_Supplier_Interaction__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Title__c, RecordTypeId, compliancequest__CAPA_Type__c, compliancequest__SQX_Supplier__c, compliancequest__SQX_Part__c, compliancequest__SQX_Site__c, compliancequest__SQX_Division__c, compliancequest__SQX_Business_Unit__c, compliancequest__SQX_Department__c, compliancequest__Severity__c, compliancequest__Probability__c, compliancequest__Target_Due_Date__c, compliancequest__Description__c, compliancequest__Status__c, compliancequest__Record_Stage__c FROM compliancequest__SQX_CAPA__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Title__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Title__c, compliancequest__Change_Category__c, compliancequest__Priority__c, compliancequest__SQX_Department__c, compliancequest__SQX_Part__c, compliancequest__SQX_Process__c, compliancequest__Description__c, compliancequest__Status__c, compliancequest__Record_Stage__c FROM compliancequest__SQX_Change_Request__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Title__c"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__Description__c, compliancequest__Active__c FROM compliancequest__SQX_Job_Function__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, compliancequest__SQX_Controlled_Document__c, compliancequest__SQX_Job_Function__c, compliancequest__Level_of_Competency__c, compliancequest__Active__c, compliancequest__Optional__c FROM compliancequest__SQX_Requirement__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Controlled_Document__r.compliancequest__Document_Number__c;compliancequest__SQX_Job_Function__r.Name"
+    },
+    {
+      "query": "SELECT Id, compliancequest__SQX_Personnel__c, compliancequest__SQX_Job_Function__c, compliancequest__Active__c FROM compliancequest__SQX_Personnel_Job_Function__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Personnel__r.compliancequest__Identification_Number__c;compliancequest__SQX_Job_Function__r.Name"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Risk_Title__c, compliancequest__Risk_Category__c, compliancequest__Reported_Priority__c, compliancequest__Identified_Date__c, compliancequest__SQX_Part__c, compliancequest__SQX_Process__c, compliancequest__SQX_Department__c, compliancequest__SQX_Supplier__c, compliancequest__Risk_Description__c, compliancequest__Status__c, compliancequest__Record_Stage__c FROM compliancequest__SQX_Risk__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Risk_Title__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Title__c, RecordTypeId, compliancequest__Meeting_Date__c, compliancequest__Objective__c, compliancequest__Agenda__c, compliancequest__Status__c, compliancequest__Record_Stage__c FROM compliancequest__SQX_Meeting__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Title__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__Title__c, RecordTypeId, cqext__Project_Category__c, compliancequest__SQX_Department__c, compliancequest__Project_Start_Date__c, compliancequest__Project_End_Date__c, compliancequest__Description__c, compliancequest__Status__c, compliancequest__Record_Stage__c FROM compliancequest__SQX_Project__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__Title__c"
     }
   ]
 }

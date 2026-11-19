@@ -55,13 +55,16 @@ Only for a scratch org loaded before 2026-11-19 (IC-REC documents loaded as Curr
 inspections, the three IC-REC documents with their files and the Closed ATL-EQ-001 calibration, so they reload
 at their starting point.
 
-## What loads (33 objects, 159 records)
+## What loads (46 objects, 196 records)
 
 Divisions, Business Unit, Sites, Departments, Processes, Accounts, Contacts, Suppliers, Supplier Contacts, Personnel,
 Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks (PHR task + 5 Questions, Investigation task),
 5 Nonconformances (+ Impacted Products, Defects, Containments), 5 Complaints (+ Defects),
 15 Controlled Documents (SOPs, work instructions, inspection criteria), 2 Audit Criteria documents (+ 8 Requirements), 1 Audit Program (+ 2 Scopes), 3 Audits,
-6 Equipment (+ 2 Schedules), 10 Specifications on the 3 Draft Inspection Criteria, 4 Inspections (Draft, no criteria or detail lines yet).
+6 Equipment (+ 2 Schedules), 10 Specifications on the 3 Draft Inspection Criteria, 4 Inspections (Draft, no criteria or detail lines yet),
+5 Supplier Parts, 2 Supplier Deviations, 1 Supplier Escalation, 1 Supplier Qualification, 1 Supplier Interaction,
+2 CAPAs, 2 Change Requests, 4 Job Functions (+ 9 Training Requirements, 5 Personnel Job Functions), 3 Risks,
+1 Management Review meeting, 1 Project.
 
 ## Choices made when converting from the spreadsheet
 
@@ -79,9 +82,13 @@ Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks
 - **Supplier accounts** use the `CQ_Supplier` record type (what CQ's supplier rules expect); customers use `Default`.
 - **Business Unit → Site:** both sites sit under the Atlas Manufacturing BU. NCs and complaints carry
   Division by site (Houston = Consumer Drones, Piscataway = Commercial Drones).
+- **Training loads inactive:** training requirements and personnel job functions load inactive (CQ's own default).
+  Activate them in CQ and CQ creates the document training for each person.
+- **Supplier record names** (SD-ATL-01 and so on) are kept with CQ's "Prevent Name Update" flag: they are the seed key.
 - **Not loaded on purpose:** investigations, Product History Reviews and audit findings (CQ's workflow creates them as
   the complaint or audit moves forward; the Atlas CQ Tasks drive the complaint steps), inspection detail lines, and
-  calibration records (easier to add in CQ when needed).
+  calibration records (easier to add in CQ when needed), CAPAs raised from NCs or findings, change orders and
+  document training records.
   CQ builds PHR checklists when a PHR is created from the complaint's PHR step; a loaded PHR may not get them.
 
 ## Controlled Documents
