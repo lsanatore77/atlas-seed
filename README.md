@@ -15,11 +15,17 @@ sf sfdmu run --sourceusername csvfile --targetusername atlas-seed --path data --
 
 `grant-cq-access.ps1` sets up the load user (the scratch org's admin) in one step:
 
-1. Builds a permission set, `Atlas_Seed_Record_Types`, that makes every active CQ record type in that org
-   visible, and deploys it. Without this, records that name a CQ record type fail with "invalid record type".
-2. Assigns that permission set plus **every** CQ permission set and permission set group
+1. Deploys the seed's own Account record type, `Default`, for the customer accounts. The snapshot has no
+   customer record type of its own; the dev sandbox's is also called `Default`.
+2. Builds a permission set, `Atlas_Seed_Record_Types`, that makes every active CQ record type in that org
+   (plus Account `Default`) visible, and deploys it. Without this, records that name a record type fail with
+   "invalid record type".
+3. Assigns that permission set plus **every** CQ permission set and permission set group
    (`compliancequest`, `cqext`, `cqcollab`) to the load user. Anything already assigned is skipped, and any
    that Salesforce refuses (for example, one needing a licence the user lacks) is listed rather than stopping the run.
+4. Writes `data\User.csv` with the load user's username. Assignees in the seed (for now, containment
+   assignees: CQ copies the assignee to the owner, which can't be blank) point at this user, so they work in
+   any org. Run the script again after rebuilding the CSVs, since the rebuild clears the `data` folder.
 
 Everything includes `CQ_Migration_User`, which CQ's validation rules check for and skip. It's labelled CAUTION
 in CQ, so the script stops on any org that doesn't look like a scratch org unless you add `-NotScratchOk`.
@@ -40,8 +46,8 @@ Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks
 
 ## Choices made when converting from the spreadsheet
 
-- **Users are not set.** Owners, assignees and "Initiated By" default to the user running the load.
-  Personnel records are not linked to users.
+- **Users:** assignees that CQ requires (containments) are set to the load user through `data\User.csv`.
+  Other owners and "Initiated By" default to the user running the load. Personnel records are not linked to users.
 - **Associated Items are not loaded.** Complaints carry Part, Part Family and Lot on the header;
   CQ creates the primary associated item itself as the complaint moves forward.
 - **Containment due dates are 2027-06-30** (CQ rejects past due dates).

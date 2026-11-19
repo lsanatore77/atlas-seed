@@ -1,7 +1,10 @@
 <#
-Gives the load user every ComplianceQuest permission set and permission set group, and a
-permission set (Atlas_Seed_Record_Types) that makes every active CQ record type visible,
-so the seed loads without "invalid record type" errors.
+Prepares a scratch org for the seed load, for the user running it:
+- deploys the seed's own Account record type for customers (Default),
+- gives the load user a permission set (Atlas_Seed_Record_Types) that makes every active CQ
+  record type, plus Account Default, visible,
+- assigns the load user every ComplianceQuest permission set and permission set group,
+- writes data\User.csv with the load user's username, so assignees in the seed resolve to them.
 
 Scratch orgs only: it grants everything, including CQ Migration User, which skips CQ's
 validation rules. It stops on an org that does not look like a scratch org unless you add
@@ -47,9 +50,11 @@ $xml = @(
     '    <hasActivationRequired>false</hasActivationRequired>',
     '    <label>Atlas Seed Record Types</label>'
 )
-foreach ($r in $rts) {
+# The seed's own Account record type (force-app) is deployed alongside, so it's listed here directly.
+$names = @('Account.Default') + @($rts | ForEach-Object { "$($_.SobjectType).$($_.NamespacePrefix)__$($_.DeveloperName)" })
+foreach ($n in ($names | Sort-Object -Unique)) {
     $xml += '    <recordTypeVisibilities>'
-    $xml += "        <recordType>$($r.SobjectType).$($r.NamespacePrefix)__$($r.DeveloperName)</recordType>"
+    $xml += "        <recordType>$n</recordType>"
     $xml += '        <visible>true</visible>'
     $xml += '    </recordTypeVisibilities>'
 }
@@ -57,7 +62,7 @@ $xml += '</PermissionSet>'
 $dir = Join-Path $PSScriptRoot 'force-app\main\default\permissionsets'
 New-Item -ItemType Directory -Force -Path $dir | Out-Null
 [IO.File]::WriteAllLines((Join-Path $dir 'Atlas_Seed_Record_Types.permissionset-meta.xml'), [string[]]$xml, (New-Object Text.UTF8Encoding $false))
-Write-Host "Record types: $($rts.Count). Deploying Atlas_Seed_Record_Types..."
+Write-Host "CQ record types: $($rts.Count). Deploying Account Default and Atlas_Seed_Record_Types..."
 Invoke-Sf @('project', 'deploy', 'start', '--source-dir', 'force-app', '--target-org', $Org, '--wait', '20') | Out-Null
 
 # 3. Assign every CQ permission set and group, plus Atlas_Seed_Record_Types, to the load user.
@@ -65,4 +70,8 @@ Write-Host 'Assigning CQ permission sets and groups...'
 $run = Invoke-Sf @('apex', 'run', '--file', 'scripts\assign-cq-access.apex', '--target-org', $Org)
 if (-not $run.success) { throw "Assignment script failed: $($run.compileProblem) $($run.exceptionMessage)" }
 $run.logs -split "`n" | Where-Object { $_ -match 'USER_DEBUG' } | ForEach-Object { Write-Host (($_ -split '\|')[-1]).Trim() }
+# 4. The load user, for assignees in the seed (matches LOAD_USER in build_sfdmu.py).
+$user = (Invoke-Sf @('org', 'display', '--target-org', $Org)).username
+[IO.File]::WriteAllLines((Join-Path $PSScriptRoot 'data\User.csv'), [string[]]@('"Id","Username"', "`"S99000000000000001`",`"$user`""), (New-Object Text.UTF8Encoding $false))
+Write-Host "Load user for assignees: $user"
 Write-Host 'Done. Load the seed next.'

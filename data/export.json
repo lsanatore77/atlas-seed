@@ -1,9 +1,14 @@
 {
   "objects": [
     {
-      "query": "SELECT Id, DeveloperName, NamespacePrefix, SobjectType FROM RecordType",
+      "query": "SELECT Id, DeveloperName, SobjectType FROM RecordType",
       "operation": "Readonly",
-      "externalId": "DeveloperName;NamespacePrefix;SobjectType"
+      "externalId": "DeveloperName;SobjectType"
+    },
+    {
+      "query": "SELECT Id, Username FROM User",
+      "operation": "Readonly",
+      "externalId": "Username"
     },
     {
       "query": "SELECT Id, Name FROM compliancequest__SQX_Division__c",
@@ -111,7 +116,7 @@
       "externalId": "compliancequest__SQX_Nonconformance__r.compliancequest__NC_Title__c;compliancequest__SQX_Defect_Code__r.Name"
     },
     {
-      "query": "SELECT Id, compliancequest__Title__c, compliancequest__SQX_Nonconformance__c, compliancequest__Description__c, compliancequest__Due_Date__c, compliancequest__Status__c FROM compliancequest__SQX_Containment__c",
+      "query": "SELECT Id, compliancequest__Title__c, compliancequest__SQX_Nonconformance__c, compliancequest__Description__c, compliancequest__Due_Date__c, compliancequest__Status__c, compliancequest__SQX_User__c FROM compliancequest__SQX_Containment__c",
       "operation": "Upsert",
       "externalId": "compliancequest__Title__c"
     },

@@ -11,6 +11,9 @@ OUT = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(OUT, "data")
 CQ = "compliancequest__"
 DUE_DATE = "2027-06-30"   # fixed future date: CQ rejects past due dates
+# The user running the load. grant-cq-access.ps1 writes data/User.csv with this made-up Id and that org's
+# username, so assignees resolve to the load user in any org.
+LOAD_USER = "S99000000000000001"
 
 wb = load_workbook(SRC)
 
@@ -58,7 +61,7 @@ acc = []
 for r in rows("Accounts"):
     city, _, country = r["City"].partition(", ")
     acc.append({"Name": r["Account Name"],
-                "RecordType.DeveloperName": "CQ_Supplier" if r["Type"] == "Supplier" else "",  # customers: org default ("Default" is not a CQ record type)
+                "RecordType.DeveloperName": "CQ_Supplier" if r["Type"] == "Supplier" else "Default",  # Default: the seed's own (force-app), deployed by grant-cq-access.ps1
                 "BillingCity": city, "BillingState": country if len(country) == 2 and country not in ("CN", "KR", "TW") else "",
                 "BillingCountry": {"CN": "China", "KR": "South Korea", "TW": "Taiwan"}.get(country, "United States"),
                 "Description": r["Supplies / Buys"]})
@@ -226,12 +229,14 @@ add("compliancequest__SQX_NC_Defect__c", f"{NCR};{CQ}SQX_Defect_Code__r.Name", d
     query_fields=[f"{CQ}SQX_Nonconformance__c", f"{CQ}SQX_Defect_Code__c", f"{CQ}SQX_Part__c", f"{CQ}Lot_Ser_Number__c",
                   f"{CQ}Defective_Quantity__c", f"{CQ}Number_of_defects__c"])
 
-c_cols = [f"{CQ}Title__c", NCR, f"{CQ}Description__c", f"{CQ}Due_Date__c", f"{CQ}Status__c"]
+c_cols = [f"{CQ}Title__c", NCR, f"{CQ}Description__c", f"{CQ}Due_Date__c", f"{CQ}Status__c", f"{CQ}SQX_User__c"]
 add("compliancequest__SQX_Containment__c", f"{CQ}Title__c", c_cols,
     [{f"{CQ}Title__c": r["Containment Action"][:255], NCR: r["Nonconformance (Title)"],
-      f"{CQ}Description__c": r["Containment Action"], f"{CQ}Due_Date__c": DUE_DATE, f"{CQ}Status__c": "Draft"}
+      f"{CQ}Description__c": r["Containment Action"], f"{CQ}Due_Date__c": DUE_DATE, f"{CQ}Status__c": "Draft",
+      f"{CQ}SQX_User__c": LOAD_USER}   # Assignee: CQ's trigger copies it to the owner, which can't be blank
      for r in rows("Containments")],
-    query_fields=[f"{CQ}Title__c", f"{CQ}SQX_Nonconformance__c", f"{CQ}Description__c", f"{CQ}Due_Date__c", f"{CQ}Status__c"])
+    query_fields=[f"{CQ}Title__c", f"{CQ}SQX_Nonconformance__c", f"{CQ}Description__c", f"{CQ}Due_Date__c", f"{CQ}Status__c",
+                  f"{CQ}SQX_User__c"])
 
 # ---------- Complaints ----------
 CR = f"{CQ}SQX_Complaint__r.{CQ}Complaint_Title__c"
@@ -438,15 +443,18 @@ if problems:
 if os.path.exists(DATA):
     shutil.rmtree(DATA)
 os.makedirs(DATA)
-# Record types: SFDMU matches these to the target org by DeveloperName + namespace + object.
-# All the record types the seed uses are CQ's own (compliancequest namespace).
+# Record types: SFDMU matches these to the target org by DeveloperName + object. No record type name repeats
+# within an object across namespaces (checked in the dev sandbox), so the namespace isn't part of the key;
+# that keeps the seed's own Account "Default" (no namespace) matchable.
 with open(os.path.join(DATA, "RecordType.csv"), "w", newline="", encoding="utf-8") as f:
     w = csv.writer(f, quoting=csv.QUOTE_ALL)
-    w.writerow(["Id", "DeveloperName", "NamespacePrefix", "SobjectType"])
+    w.writerow(["Id", "DeveloperName", "SobjectType"])
     for rid, (dev, sobj) in sorted(record_types.items(), key=lambda x: (x[1][1], x[1][0])):
-        w.writerow([rid, dev, "compliancequest", sobj])
-export = {"objects": [{"query": "SELECT Id, DeveloperName, NamespacePrefix, SobjectType FROM RecordType",
-                       "operation": "Readonly", "externalId": "DeveloperName;NamespacePrefix;SobjectType"}]}
+        w.writerow([rid, dev, sobj])
+export = {"objects": [{"query": "SELECT Id, DeveloperName, SobjectType FROM RecordType",
+                       "operation": "Readonly", "externalId": "DeveloperName;SobjectType"},
+                      # data/User.csv is written per org by grant-cq-access.ps1 (the load user only).
+                      {"query": "SELECT Id, Username FROM User", "operation": "Readonly", "externalId": "Username"}]}
 for o in objects:
     with open(os.path.join(DATA, o["sobject"] + ".csv"), "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=o["columns"], quoting=csv.QUOTE_ALL)
