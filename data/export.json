@@ -211,21 +211,6 @@
       "externalId": "compliancequest__Title__c"
     },
     {
-      "query": "SELECT Id, Name, compliancequest__Description__c, compliancequest__Active__c FROM compliancequest__SQX_Job_Function__c",
-      "operation": "Upsert",
-      "externalId": "Name"
-    },
-    {
-      "query": "SELECT Id, compliancequest__SQX_Controlled_Document__c, compliancequest__SQX_Job_Function__c, compliancequest__Level_of_Competency__c, compliancequest__Active__c, compliancequest__Optional__c FROM compliancequest__SQX_Requirement__c",
-      "operation": "Upsert",
-      "externalId": "compliancequest__SQX_Controlled_Document__r.compliancequest__Document_Number__c;compliancequest__SQX_Job_Function__r.Name"
-    },
-    {
-      "query": "SELECT Id, compliancequest__SQX_Personnel__c, compliancequest__SQX_Job_Function__c, compliancequest__Active__c FROM compliancequest__SQX_Personnel_Job_Function__c",
-      "operation": "Upsert",
-      "externalId": "compliancequest__SQX_Personnel__r.compliancequest__Identification_Number__c;compliancequest__SQX_Job_Function__r.Name"
-    },
-    {
       "query": "SELECT Id, compliancequest__Risk_Title__c, compliancequest__Risk_Category__c, compliancequest__Reported_Priority__c, compliancequest__Identified_Date__c, compliancequest__SQX_Part__c, compliancequest__SQX_Process__c, compliancequest__SQX_Department__c, compliancequest__SQX_Supplier__c, compliancequest__Risk_Description__c, compliancequest__Status__c, compliancequest__Record_Stage__c FROM compliancequest__SQX_Risk__c",
       "operation": "Upsert",
       "externalId": "compliancequest__Risk_Title__c"

@@ -2,8 +2,8 @@
 
 Fictional, non-regulated drone maker. ~5 records per object.
 
-**Starting point rule:** every record with a workflow (NCs, complaints, audits, inspections, and later CAPAs, changes,
-training) loads at its first status (Draft, or Open where CQ starts there) and is moved forward in CQ by hand or by
+**Starting point rule:** every record with a workflow (NCs, complaints, audits, inspections, CAPAs, changes, risks)
+loads at its first status (Draft, or Open where CQ starts there) and is moved forward in CQ by hand or by
 automation. Records CQ's workflow creates along the way (investigations, PHRs, findings, checklists) are not loaded. Reference data (released SOPs and work instructions, parts, suppliers, equipment) loads ready to use.
 Built from `Atlas_Manufacturing_Dev_Seed_Data.xlsx`. Field names checked against the dev sandbox (CQ 16.0) on 2026-11-09.
 
@@ -63,8 +63,7 @@ Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks
 15 Controlled Documents (SOPs, work instructions, inspection criteria), 2 Audit Criteria documents (+ 8 Requirements), 1 Audit Program (+ 2 Scopes), 3 Audits,
 6 Equipment (+ 2 Schedules), 10 Specifications on the 3 Draft Inspection Criteria, 4 Inspections (Draft, no criteria or detail lines yet),
 5 Supplier Parts, 2 Supplier Deviations, 1 Supplier Escalation, 1 Supplier Qualification, 1 Supplier Interaction,
-2 CAPAs, 2 Change Requests, 4 Job Functions (+ 9 Training Requirements, 5 Personnel Job Functions), 3 Risks,
-1 Management Review meeting, 1 Project.
+2 CAPAs, 2 Change Requests, 3 Risks, 1 Management Review meeting, 1 Project.
 
 ## Choices made when converting from the spreadsheet
 
@@ -82,13 +81,12 @@ Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks
 - **Supplier accounts** use the `CQ_Supplier` record type (what CQ's supplier rules expect); customers use `Default`.
 - **Business Unit → Site:** both sites sit under the Atlas Manufacturing BU. NCs and complaints carry
   Division by site (Houston = Consumer Drones, Piscataway = Commercial Drones).
-- **Training loads inactive:** training requirements and personnel job functions load inactive (CQ's own default).
-  Activate them in CQ and CQ creates the document training for each person.
+- **Training is not loaded yet** (job functions, requirements, personnel job functions). The 11 released SOPs and work
+  instructions are ready to train on when it's added.
 - **Supplier record names** (SD-ATL-01 and so on) are kept with CQ's "Prevent Name Update" flag: they are the seed key.
 - **Not loaded on purpose:** investigations, Product History Reviews and audit findings (CQ's workflow creates them as
   the complaint or audit moves forward; the Atlas CQ Tasks drive the complaint steps), inspection detail lines, and
-  calibration records (easier to add in CQ when needed), CAPAs raised from NCs or findings, change orders and
-  document training records.
+  calibration records (easier to add in CQ when needed), CAPAs raised from NCs or findings, and change orders.
   CQ builds PHR checklists when a PHR is created from the complaint's PHR step; a loaded PHR may not get them.
 
 ## Controlled Documents

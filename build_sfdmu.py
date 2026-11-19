@@ -469,8 +469,7 @@ add("compliancequest__SQX_Inspection__c", f"{CQ}Lot_Number__c", ins_cols,
 
 # ---------- Supplier records, CAPA, changes, training, risks, meetings, projects ----------
 # Every workflow record loads at its starting point (Draft). CQ names the supplier records itself unless
-# "Prevent Name Update" is set, so it is set to keep the seed's names (the Seed Key). Training requirements and
-# personnel job functions load inactive (CQ's default): activating them in CQ creates the document training.
+# "Prevent Name Update" is set, so it is set to keep the seed's names (the Seed Key). Training is not loaded yet.
 SUPN = f"{CQ}SQX_Supplier__r.{CQ}Supplier_Number__c"
 PARTN = f"{CQ}SQX_Part__r.{CQ}Part_Number__c"
 DRAFT = {f"{CQ}Status__c": "Draft", f"{CQ}Record_Stage__c": "Draft"}
@@ -543,22 +542,6 @@ add_q("compliancequest__SQX_Change_Request__c", f"{CQ}Title__c", cr_cols,
       [{f"{CQ}Title__c": r["Title (Seed Key)"], f"{CQ}Change_Category__c": r["Change Category"], f"{CQ}Priority__c": r["Priority"],
         f"{CQ}SQX_Department__r.Name": r["Department"], PARTN: r["Part"], f"{CQ}SQX_Process__r.Name": r["Process"],
         f"{CQ}Description__c": r["Description"], **DRAFT} for r in rows("Change Requests")])
-
-add_q("compliancequest__SQX_Job_Function__c", "Name", ["Name", f"{CQ}Description__c", f"{CQ}Active__c"],
-      [{"Name": r["Name (Seed Key)"], f"{CQ}Description__c": r["Description"], f"{CQ}Active__c": "TRUE"}
-       for r in rows("Job Functions")])
-
-REQDOC = f"{CQ}SQX_Controlled_Document__r.{CQ}Document_Number__c"
-JFN = f"{CQ}SQX_Job_Function__r.Name"
-add_q("compliancequest__SQX_Requirement__c", f"{REQDOC};{JFN}",
-      [REQDOC, JFN, f"{CQ}Level_of_Competency__c", f"{CQ}Active__c", f"{CQ}Optional__c"],
-      [{REQDOC: r["Controlled Document (Number)"], JFN: r["Job Function"], f"{CQ}Level_of_Competency__c": r["Level of Competency"],
-        f"{CQ}Active__c": "FALSE", f"{CQ}Optional__c": "FALSE"} for r in rows("Training Requirements")])
-
-PERSN = f"{CQ}SQX_Personnel__r.{CQ}Identification_Number__c"
-add_q("compliancequest__SQX_Personnel_Job_Function__c", f"{PERSN};{JFN}", [PERSN, JFN, f"{CQ}Active__c"],
-      [{PERSN: r["Personnel (Identification Number)"], JFN: r["Job Function"], f"{CQ}Active__c": "FALSE"}
-       for r in rows("Personnel Job Functions")])
 
 risk_cols = [f"{CQ}Risk_Title__c", f"{CQ}Risk_Category__c", f"{CQ}Reported_Priority__c", f"{CQ}Identified_Date__c", PARTN,
              f"{CQ}SQX_Process__r.Name", f"{CQ}SQX_Department__r.Name", SUPN, f"{CQ}Risk_Description__c",

@@ -1,5 +1,0 @@
-"Id","Name","compliancequest__Description__c","compliancequest__Active__c"
-"S41000000000000001","Assembly Technician","Builds drones on the Houston final assembly line.","TRUE"
-"S41000000000000002","Receiving Inspector","Inspects incoming parts at the Piscataway receiving bench.","TRUE"
-"S41000000000000003","Quality Engineer","Owns NCs, CAPAs, audits and document control.","TRUE"
-"S41000000000000004","Customer Service","Takes customer complaints and returns.","TRUE"

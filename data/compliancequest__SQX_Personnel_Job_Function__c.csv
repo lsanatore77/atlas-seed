@@ -1,6 +1,0 @@
-"Id","compliancequest__SQX_Personnel__c","compliancequest__SQX_Personnel__r.compliancequest__Identification_Number__c","compliancequest__SQX_Job_Function__c","compliancequest__SQX_Job_Function__r.Name","compliancequest__Active__c"
-"S43000000000000001","S10000000000000001","ATL-EMP-001","S41000000000000003","Quality Engineer","FALSE"
-"S43000000000000002","S10000000000000005","ATL-EMP-005","S41000000000000003","Quality Engineer","FALSE"
-"S43000000000000003","S10000000000000002","ATL-EMP-002","S41000000000000001","Assembly Technician","FALSE"
-"S43000000000000004","S10000000000000003","ATL-EMP-003","S41000000000000002","Receiving Inspector","FALSE"
-"S43000000000000005","S10000000000000004","ATL-EMP-004","S41000000000000004","Customer Service","FALSE"
