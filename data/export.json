@@ -169,6 +169,21 @@
       "query": "SELECT Id, compliancequest__Title__c, RecordTypeId, compliancequest__SQX_Audit__c, compliancequest__Finding_Type__c, compliancequest__Status__c, compliancequest__SQX_Site__c, compliancequest__SQX_Department__c, compliancequest__SQX_Supplier__c, compliancequest__Issue_Date__c, compliancequest__Due_Date__c, compliancequest__Description__c FROM compliancequest__SQX_Finding__c",
       "operation": "Upsert",
       "externalId": "compliancequest__Title__c"
+    },
+    {
+      "query": "SELECT Id, Name, compliancequest__Equipment_Description__c, compliancequest__Equipment_Type__c, compliancequest__Equipment_Status__c, compliancequest__Manufacturer__c, compliancequest__Model_Number__c, compliancequest__Serial_Number__c, compliancequest__Equipment_Location__c, compliancequest__SQX_Site__c, compliancequest__SQX_Department__c, compliancequest__SQX_Business_Unit__c, compliancequest__Requires_Periodic_Calibration__c, compliancequest__Calibration_Interval__c, compliancequest__Calibration_Source__c, compliancequest__SQX_Calibration_Supplier__c, compliancequest__Last_Calibration_Date__c, compliancequest__Next_Calibration_Date__c, compliancequest__SQX_Applicable_Procedure_Rev__c FROM compliancequest__SQX_Equipment__c",
+      "operation": "Upsert",
+      "externalId": "Name"
+    },
+    {
+      "query": "SELECT Id, compliancequest__SQX_Equipment__c, compliancequest__Calibration_Date__c, compliancequest__Performed_By__c, compliancequest__SQX_Calibration_Supplier__c, compliancequest__Calibration_Certificate_Number__c, compliancequest__Initial_Calibration_Result__c, compliancequest__Final_Calibration_Result__c, compliancequest__Adjustment_Made__c, compliancequest__Next_Calibration_Date__c, compliancequest__Calibration_Status__c, compliancequest__Calibration_Comments__c FROM compliancequest__SQX_Calibration__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Equipment__r.Name;compliancequest__Calibration_Date__c"
+    },
+    {
+      "query": "SELECT Id, compliancequest__SQX_Equipment__c, compliancequest__Uniqueness_Constraint__c, compliancequest__Active__c, compliancequest__Recurring_Event__c, compliancequest__Recurring_Interval__c, compliancequest__Recurring_Unit__c, compliancequest__Schedule_Basis__c, compliancequest__Last_Performed_Date__c, compliancequest__Next_Due_Date__c, compliancequest__SQX_Applicable_Procedure__c, compliancequest__Comments__c FROM compliancequest__SQX_Equipment_Event_Schedule__c",
+      "operation": "Upsert",
+      "externalId": "compliancequest__SQX_Equipment__r.Name;compliancequest__Uniqueness_Constraint__c"
     }
   ]
 }

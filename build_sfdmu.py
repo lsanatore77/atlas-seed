@@ -390,6 +390,73 @@ add("compliancequest__SQX_Finding__c", f"{CQ}Title__c", fnd_cols,
     query_fields=[f"{CQ}Title__c", "RecordTypeId", f"{CQ}SQX_Audit__c"] +
                  [c.replace("__r.Name", "__c").replace(f"__r.{CQ}Supplier_Number__c", "__c") for c in fnd_cols[3:]])
 
+# ---------- Equipment ----------
+# Equipment number (Name) is the key. Calibration status is carried on the equipment (Last/Next Calibration
+# Date); calibrations load as Open, since CQ closes them with a sign-off. Procedures point at Controlled Documents.
+EQR = f"{CQ}SQX_Equipment__r.Name"
+eq_cols = ["Name", f"{CQ}Equipment_Description__c", f"{CQ}Equipment_Type__c", f"{CQ}Equipment_Status__c",
+           f"{CQ}Manufacturer__c", f"{CQ}Model_Number__c", f"{CQ}Serial_Number__c", f"{CQ}Equipment_Location__c",
+           f"{CQ}SQX_Site__r.Name", f"{CQ}SQX_Department__r.Name", f"{CQ}SQX_Business_Unit__r.Name",
+           f"{CQ}Requires_Periodic_Calibration__c", f"{CQ}Calibration_Interval__c", f"{CQ}Calibration_Source__c",
+           f"{CQ}SQX_Calibration_Supplier__r.Name", f"{CQ}Last_Calibration_Date__c", f"{CQ}Next_Calibration_Date__c",
+           f"{CQ}SQX_Applicable_Procedure_Rev__r.{CQ}Document_Number__c"]
+
+
+def d10(v):
+    return str(v)[:10] if v else ""
+
+
+add("compliancequest__SQX_Equipment__c", "Name", eq_cols,
+    [{"Name": r["Equipment Number (Seed Key)"], f"{CQ}Equipment_Description__c": r["Description"],
+      f"{CQ}Equipment_Type__c": r["Equipment Type"], f"{CQ}Equipment_Status__c": r["Equipment Status"],
+      f"{CQ}Manufacturer__c": r["Manufacturer"], f"{CQ}Model_Number__c": r["Model Number"],
+      f"{CQ}Serial_Number__c": r["Serial Number"], f"{CQ}Equipment_Location__c": r["Location"],
+      f"{CQ}SQX_Site__r.Name": r["Site"], f"{CQ}SQX_Department__r.Name": r["Department"],
+      f"{CQ}SQX_Business_Unit__r.Name": "Atlas Manufacturing",
+      f"{CQ}Requires_Periodic_Calibration__c": tf(r["Requires Periodic Calibration"]),
+      f"{CQ}Calibration_Interval__c": r["Calibration Interval (days)"], f"{CQ}Calibration_Source__c": r["Calibration Source"],
+      f"{CQ}SQX_Calibration_Supplier__r.Name": r["Calibration Lab (Account)"],
+      f"{CQ}Last_Calibration_Date__c": d10(r["Last Calibration Date"]), f"{CQ}Next_Calibration_Date__c": d10(r["Next Calibration Date"]),
+      f"{CQ}SQX_Applicable_Procedure_Rev__r.{CQ}Document_Number__c": r["Applicable Procedure (Document Number)"]}
+     for r in rows("Equipment")],
+    query_fields=["Name", f"{CQ}Equipment_Description__c", f"{CQ}Equipment_Type__c", f"{CQ}Equipment_Status__c",
+                  f"{CQ}Manufacturer__c", f"{CQ}Model_Number__c", f"{CQ}Serial_Number__c", f"{CQ}Equipment_Location__c",
+                  f"{CQ}SQX_Site__c", f"{CQ}SQX_Department__c", f"{CQ}SQX_Business_Unit__c",
+                  f"{CQ}Requires_Periodic_Calibration__c", f"{CQ}Calibration_Interval__c", f"{CQ}Calibration_Source__c",
+                  f"{CQ}SQX_Calibration_Supplier__c", f"{CQ}Last_Calibration_Date__c", f"{CQ}Next_Calibration_Date__c",
+                  f"{CQ}SQX_Applicable_Procedure_Rev__c"])
+
+cal_cols = [EQR, f"{CQ}Calibration_Date__c", f"{CQ}Performed_By__c", f"{CQ}SQX_Calibration_Supplier__r.Name",
+            f"{CQ}Calibration_Certificate_Number__c", f"{CQ}Initial_Calibration_Result__c", f"{CQ}Final_Calibration_Result__c",
+            f"{CQ}Adjustment_Made__c", f"{CQ}Next_Calibration_Date__c", f"{CQ}Calibration_Status__c", f"{CQ}Calibration_Comments__c"]
+add("compliancequest__SQX_Calibration__c", f"{EQR};{CQ}Calibration_Date__c", cal_cols,
+    [{EQR: r["Equipment (Seed Key)"], f"{CQ}Calibration_Date__c": d10(r["Calibration Date"]),
+      f"{CQ}Performed_By__c": r["Performed By"], f"{CQ}SQX_Calibration_Supplier__r.Name": r["Calibration Lab (Account)"],
+      f"{CQ}Calibration_Certificate_Number__c": r["Certificate Number"],
+      f"{CQ}Initial_Calibration_Result__c": r["Initial Result"], f"{CQ}Final_Calibration_Result__c": r["Final Result"],
+      f"{CQ}Adjustment_Made__c": tf(r["Adjustment Made"]), f"{CQ}Next_Calibration_Date__c": d10(r["Next Calibration Date"]),
+      f"{CQ}Calibration_Status__c": r["Calibration Status"], f"{CQ}Calibration_Comments__c": r["Comments"]}
+     for r in rows("Calibrations")],
+    query_fields=[f"{CQ}SQX_Equipment__c", f"{CQ}Calibration_Date__c", f"{CQ}Performed_By__c", f"{CQ}SQX_Calibration_Supplier__c",
+                  f"{CQ}Calibration_Certificate_Number__c", f"{CQ}Initial_Calibration_Result__c",
+                  f"{CQ}Final_Calibration_Result__c", f"{CQ}Adjustment_Made__c", f"{CQ}Next_Calibration_Date__c",
+                  f"{CQ}Calibration_Status__c", f"{CQ}Calibration_Comments__c"])
+
+sch_cols = [EQR, f"{CQ}Uniqueness_Constraint__c", f"{CQ}Active__c", f"{CQ}Recurring_Event__c", f"{CQ}Recurring_Interval__c",
+            f"{CQ}Recurring_Unit__c", f"{CQ}Schedule_Basis__c", f"{CQ}Last_Performed_Date__c", f"{CQ}Next_Due_Date__c",
+            f"{CQ}SQX_Applicable_Procedure__r.{CQ}Document_Number__c", f"{CQ}Comments__c"]
+add("compliancequest__SQX_Equipment_Event_Schedule__c", f"{EQR};{CQ}Uniqueness_Constraint__c", sch_cols,
+    [{EQR: r["Equipment (Seed Key)"], f"{CQ}Uniqueness_Constraint__c": r["Event Name"], f"{CQ}Active__c": tf(r["Active"]),
+      f"{CQ}Recurring_Event__c": "TRUE", f"{CQ}Recurring_Interval__c": r["Recurring Interval"],
+      f"{CQ}Recurring_Unit__c": r["Recurring Unit"], f"{CQ}Schedule_Basis__c": r["Schedule Basis"],
+      f"{CQ}Last_Performed_Date__c": d10(r["Last Performed Date"]), f"{CQ}Next_Due_Date__c": d10(r["Next Due Date"]),
+      f"{CQ}SQX_Applicable_Procedure__r.{CQ}Document_Number__c": r["Applicable Procedure (Document Number)"],
+      f"{CQ}Comments__c": r["Comments"]}
+     for r in rows("Equipment Schedules")],
+    query_fields=[f"{CQ}SQX_Equipment__c", f"{CQ}Uniqueness_Constraint__c", f"{CQ}Active__c", f"{CQ}Recurring_Event__c",
+                  f"{CQ}Recurring_Interval__c", f"{CQ}Recurring_Unit__c", f"{CQ}Schedule_Basis__c",
+                  f"{CQ}Last_Performed_Date__c", f"{CQ}Next_Due_Date__c", f"{CQ}SQX_Applicable_Procedure__c", f"{CQ}Comments__c"])
+
 # ---------- Source Ids ----------
 # SFDMU did not resolve the "<Lookup>__r.<ExternalId>" columns on their own (every lookup and record type
 # came through blank), so the CSVs are written the way SFDMU itself exports them: an Id column with a
@@ -408,6 +475,8 @@ PARENT = {  # relationship name (without namespace) -> parent object
     "SQX_Complaint__r": "SQX_Complaint__c",
     "SQX_Controlled_Document__r": "SQX_Controlled_Document__c", "SQX_Audit_Criteria_Document__r": "SQX_Controlled_Document__c",
     "SQX_Audit_Program__r": "SQX_Audit_Program__c", "SQX_Audit__r": "SQX_Audit__c", "Account__r": "Account",
+    "SQX_Equipment__r": "SQX_Equipment__c", "SQX_Calibration_Supplier__r": "Account",
+    "SQX_Applicable_Procedure_Rev__r": "SQX_Controlled_Document__c", "SQX_Applicable_Procedure__r": "SQX_Controlled_Document__c",
 }
 
 
