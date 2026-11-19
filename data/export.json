@@ -191,14 +191,9 @@
       "externalId": "compliancequest__Specification_Number__c"
     },
     {
-      "query": "SELECT Id, compliancequest__Lot_Number__c, compliancequest__SQX_Part__c, compliancequest__SQX_Supplier__c, compliancequest__SQX_Supplier_Number__c, compliancequest__SQX_Inspection_Criteria__c, compliancequest__Inspection_Source__c, compliancequest__Inspection_Type__c, compliancequest__SQX_Department__c, compliancequest__Lot_Quantity__c, compliancequest__Sample_Size__c, compliancequest__Status__c, compliancequest__Inspection_Result__c, compliancequest__Review_Required__c, compliancequest__Approval_Status__c, compliancequest__Initiated_Date_Time__c, compliancequest__Completion_Date_Time__c, compliancequest__Close_Date_Time__c, compliancequest__SQX_Completed_By__c, compliancequest__SQX_Reviewed_By__c, compliancequest__SQX_Closure_Reviewer__c, compliancequest__SQX_NC_Number__c, compliancequest__Create_NC_If_Inspection_Fails__c, compliancequest__Comment__c FROM compliancequest__SQX_Inspection__c",
+      "query": "SELECT Id, compliancequest__Lot_Number__c, compliancequest__SQX_Part__c, compliancequest__SQX_Supplier__c, compliancequest__SQX_Supplier_Number__c, compliancequest__Inspection_Source__c, compliancequest__Inspection_Type__c, compliancequest__SQX_Department__c, compliancequest__Lot_Quantity__c, compliancequest__Sample_Size__c, compliancequest__Status__c, compliancequest__Initiated_Date_Time__c, compliancequest__SQX_NC_Number__c, compliancequest__Create_NC_If_Inspection_Fails__c, compliancequest__Comment__c FROM compliancequest__SQX_Inspection__c",
       "operation": "Upsert",
       "externalId": "compliancequest__Lot_Number__c"
-    },
-    {
-      "query": "SELECT Id, compliancequest__SQX_Inspection__c, compliancequest__SQX_Specification__c, compliancequest__Characteristics__c, compliancequest__Specification__c, compliancequest__Lower_Spec_Limit__c, compliancequest__Upper_Spec_Limit__c, compliancequest__Impact__c, compliancequest__Inspection_Method__c, compliancequest__Sample_Size__c, compliancequest__Observed_Value__c, compliancequest__Result__c, compliancequest__Defective_Quantity__c, compliancequest__Number_of_Defects__c, compliancequest__SQX_Equipment__c, compliancequest__Equipment_Calibrated__c, compliancequest__Observation__c FROM compliancequest__SQX_Inspection_Detail__c",
-      "operation": "Update",
-      "externalId": "compliancequest__SQX_Inspection__r.compliancequest__Lot_Number__c;compliancequest__SQX_Specification__r.compliancequest__Specification_Number__c"
     }
   ]
 }

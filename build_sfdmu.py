@@ -469,10 +469,10 @@ add("compliancequest__SQX_Equipment_Event_Schedule__c", f"{EQR};{CQ}Uniqueness_C
                   f"{CQ}Last_Performed_Date__c", f"{CQ}Next_Due_Date__c", f"{CQ}SQX_Applicable_Procedure__c", f"{CQ}Comments__c"])
 
 # ---------- Inspections ----------
-# Specifications sit under the Inspection Criteria documents (key: Specification Number). Inspections are keyed on
-# Lot Number, details on inspection + specification. The load user is inspector, completer and closure reviewer:
-# CQ's migration permission lets that through for the load. Create NC If Inspection Fails is off so CQ doesn't raise
-# new NCs; failed inspections point at the existing ones.
+# Specifications sit under the Inspection Criteria documents (key: Specification Number). CQ only accepts them on a
+# Draft criteria document, so the IC-REC documents load as Draft. Inspections (key: Lot Number) are Draft or Open with
+# no criteria and no detail lines: criteria get added in CQ when an inspection is worked (CQ refuses detail lines on a
+# closed inspection, so none are loaded closed). Create NC If Inspection Fails is off; failed lots point at their NCs.
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -512,57 +512,22 @@ add("compliancequest__SQX_Specification__c", f"{CQ}Specification_Number__c", spe
 
 account_of_supplier = {r["Supplier Name"]: r["Account"] for r in rows("Suppliers")}
 ins_cols = [f"{CQ}Lot_Number__c", f"{CQ}SQX_Part__r.{CQ}Part_Number__c", f"{CQ}SQX_Supplier__r.{CQ}Supplier_Number__c",
-            f"{CQ}SQX_Supplier_Number__r.Name", CRIT, f"{CQ}Inspection_Source__c", f"{CQ}Inspection_Type__c",
+            f"{CQ}SQX_Supplier_Number__r.Name", f"{CQ}Inspection_Source__c", f"{CQ}Inspection_Type__c",
             f"{CQ}SQX_Department__r.Name", f"{CQ}Lot_Quantity__c", f"{CQ}Sample_Size__c", f"{CQ}Status__c",
-            f"{CQ}Inspection_Result__c", f"{CQ}Review_Required__c", f"{CQ}Approval_Status__c",
-            f"{CQ}Initiated_Date_Time__c", f"{CQ}Completion_Date_Time__c", f"{CQ}Close_Date_Time__c",
-            f"{CQ}SQX_Completed_By__c", f"{CQ}SQX_Reviewed_By__c", f"{CQ}SQX_Closure_Reviewer__c",
-            f"{CQ}SQX_NC_Number__r.{CQ}NC_Title__c", f"{CQ}Create_NC_If_Inspection_Fails__c", f"{CQ}Comment__c"]
-ins_rows = []
-sample_of = {}
-for r in rows("Inspections"):
-    done = r["Status"] in ("Complete", "Closed")
-    sample_of[r["Lot Number (Seed Key)"]] = r["Sample Size"]
-    ins_rows.append({
-        f"{CQ}Lot_Number__c": r["Lot Number (Seed Key)"], f"{CQ}SQX_Part__r.{CQ}Part_Number__c": r["Part"],
-        f"{CQ}SQX_Supplier__r.{CQ}Supplier_Number__c": r["Supplier"],
-        f"{CQ}SQX_Supplier_Number__r.Name": account_of_supplier[r["Supplier"]],
-        CRIT: r["Inspection Criteria (Document Number)"], f"{CQ}Inspection_Source__c": r["Inspection Source"],
-        f"{CQ}Inspection_Type__c": r["Inspection Type"], f"{CQ}SQX_Department__r.Name": r["Department"],
-        f"{CQ}Lot_Quantity__c": r["Lot Quantity"], f"{CQ}Sample_Size__c": r["Sample Size"], f"{CQ}Status__c": r["Status"],
-        f"{CQ}Inspection_Result__c": r["Inspection Result"], f"{CQ}Review_Required__c": tf(r["Review Required"]),
-        f"{CQ}Approval_Status__c": r["Approval Status"],
-        f"{CQ}Initiated_Date_Time__c": central_dt(r["Initiated"]), f"{CQ}Completion_Date_Time__c": central_dt(r["Completed"]),
-        f"{CQ}Close_Date_Time__c": central_dt(r["Closed"]),
-        f"{CQ}SQX_Completed_By__c": LOAD_USER if done else "",
-        f"{CQ}SQX_Reviewed_By__c": LOAD_USER if r["Status"] == "Closed" else "",
-        f"{CQ}SQX_Closure_Reviewer__c": LOAD_USER if tf(r["Review Required"]) == "TRUE" else "",
-        f"{CQ}SQX_NC_Number__r.{CQ}NC_Title__c": r["Nonconformance (Title)"],
-        f"{CQ}Create_NC_If_Inspection_Fails__c": "FALSE", f"{CQ}Comment__c": r["Comment"]})
-add("compliancequest__SQX_Inspection__c", f"{CQ}Lot_Number__c", ins_cols, ins_rows, query_fields=qf(ins_cols))
-
-INSR = f"{CQ}SQX_Inspection__r.{CQ}Lot_Number__c"
-SPECR = f"{CQ}SQX_Specification__r.{CQ}Specification_Number__c"
-det_cols = [INSR, SPECR, f"{CQ}Characteristics__c", f"{CQ}Specification__c", f"{CQ}Lower_Spec_Limit__c",
-            f"{CQ}Upper_Spec_Limit__c", f"{CQ}Impact__c", f"{CQ}Inspection_Method__c", f"{CQ}Sample_Size__c",
-            f"{CQ}Observed_Value__c", f"{CQ}Result__c", f"{CQ}Defective_Quantity__c", f"{CQ}Number_of_Defects__c",
-            EQR, f"{CQ}Equipment_Calibrated__c", f"{CQ}Observation__c"]
-dets = []
-for r in rows("Inspection Details"):
-    s = spec_by_num[r["Specification (Number)"]]
-    dets.append({INSR: r["Inspection (Lot Number)"], SPECR: r["Specification (Number)"],
-                 **{k: s[k] for k in (f"{CQ}Characteristics__c", f"{CQ}Specification__c", f"{CQ}Lower_Spec_Limit__c",
-                                      f"{CQ}Upper_Spec_Limit__c", f"{CQ}Impact__c", f"{CQ}Inspection_Method__c")},
-                 f"{CQ}Sample_Size__c": sample_of[r["Inspection (Lot Number)"]] if r["Result"] else "",
-                 f"{CQ}Observed_Value__c": num(r["Observed Value"]), f"{CQ}Result__c": r["Result"],
-                 f"{CQ}Defective_Quantity__c": num(r["Defective Quantity"]),
-                 f"{CQ}Number_of_Defects__c": num(r["Defective Quantity"]), EQR: r["Equipment"],
-                 f"{CQ}Equipment_Calibrated__c": tf(r["Equipment Calibrated"]), f"{CQ}Observation__c": r["Observation"]})
-# Update, not Upsert: CQ copies each specification into a detail line when the inspection is created, so these rows
-# fill in CQ's lines (matched on inspection + specification) instead of adding a second set. SFDMU reads the org
-# before it writes, so the lines only exist to match on the second run: load once, then run again for the results.
-add("compliancequest__SQX_Inspection_Detail__c", f"{INSR};{SPECR}", det_cols, dets, query_fields=qf(det_cols),
-    operation="Update")
+            f"{CQ}Initiated_Date_Time__c", f"{CQ}SQX_NC_Number__r.{CQ}NC_Title__c",
+            f"{CQ}Create_NC_If_Inspection_Fails__c", f"{CQ}Comment__c"]
+add("compliancequest__SQX_Inspection__c", f"{CQ}Lot_Number__c", ins_cols,
+    [{f"{CQ}Lot_Number__c": r["Lot Number (Seed Key)"], f"{CQ}SQX_Part__r.{CQ}Part_Number__c": r["Part"],
+      f"{CQ}SQX_Supplier__r.{CQ}Supplier_Number__c": r["Supplier"],
+      f"{CQ}SQX_Supplier_Number__r.Name": account_of_supplier[r["Supplier"]],
+      f"{CQ}Inspection_Source__c": r["Inspection Source"], f"{CQ}Inspection_Type__c": r["Inspection Type"],
+      f"{CQ}SQX_Department__r.Name": r["Department"], f"{CQ}Lot_Quantity__c": r["Lot Quantity"],
+      f"{CQ}Sample_Size__c": r["Sample Size"], f"{CQ}Status__c": r["Status"],
+      f"{CQ}Initiated_Date_Time__c": central_dt(r["Initiated"]),
+      f"{CQ}SQX_NC_Number__r.{CQ}NC_Title__c": r["Nonconformance (Title)"],
+      f"{CQ}Create_NC_If_Inspection_Fails__c": "FALSE", f"{CQ}Comment__c": r["Comment"]}
+     for r in rows("Inspections")],
+    query_fields=qf(ins_cols))
 
 # ---------- Source Ids ----------
 # SFDMU did not resolve the "<Lookup>__r.<ExternalId>" columns on their own (every lookup and record type
@@ -585,8 +550,7 @@ PARENT = {  # relationship name (without namespace) -> parent object
     "SQX_Equipment__r": "SQX_Equipment__c", "SQX_Calibration_Supplier__r": "Account",
     "SQX_Applicable_Procedure_Rev__r": "SQX_Controlled_Document__c", "SQX_Applicable_Procedure__r": "SQX_Controlled_Document__c",
     "SQX_Inspection_Criteria__r": "SQX_Controlled_Document__c", "SQX_Supplier_Number__r": "Account",
-    "SQX_NC_Number__r": "SQX_Nonconformance__c", "SQX_Inspection__r": "SQX_Inspection__c",
-    "SQX_Specification__r": "SQX_Specification__c",
+    "SQX_NC_Number__r": "SQX_Nonconformance__c",
 }
 
 
