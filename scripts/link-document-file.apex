@@ -63,7 +63,8 @@ try {
             String wantTitle = String.isBlank(d.compliancequest__Title__c) ? latest.Title : d.compliancequest__Title__c.left(255);
             Boolean titleOk = latest.Title == wantTitle;
             if (!fieldsChanged && inLibrary && titleOk) {
-                result = 'ALREADY LINKED: ' + docNumber;
+                result = 'ALREADY LINKED: ' + docNumber +
+                         (lib == null ? ' (no library found: run grant-cq-access.ps1 to create CQ\'s libraries, then run this again)' : '');
             } else if (dryRun) {
                 result = 'WOULD UPDATE: ' + docNumber + ' (' + (inLibrary ? '' : 'file into library; ') + (fieldsChanged ? 'library fields; ' : '') +
                          (titleOk ? '' : 'file title') + ')' + (lib == null ? ' (no library found)' : '');
