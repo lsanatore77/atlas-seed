@@ -28,9 +28,10 @@ function Invoke-Sf([string[]]$SfArgs) {
 }
 
 # 1. Scratch org check (scratch orgs carry an expiration date).
-$org = (Invoke-Sf @('data', 'query', '--query', 'SELECT Name, TrialExpirationDate FROM Organization', '--target-org', $Org)).records[0]
-if (-not $org.TrialExpirationDate -and -not $NotScratchOk) {
-    Write-Host "$($org.Name) does not look like a scratch org. This script grants every CQ permission, including"
+# (PowerShell names ignore case, so this must not be called $org: that is the -Org parameter.)
+$orgInfo = (Invoke-Sf @('data', 'query', '--query', 'SELECT Name, TrialExpirationDate FROM Organization', '--target-org', $Org)).records[0]
+if (-not $orgInfo.TrialExpirationDate -and -not $NotScratchOk) {
+    Write-Host "$($orgInfo.Name) does not look like a scratch org. This script grants every CQ permission, including"
     Write-Host "CQ Migration User. Add -NotScratchOk only if you are sure."
     exit 1
 }
