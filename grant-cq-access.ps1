@@ -4,6 +4,9 @@ Prepares a scratch org for the seed load, for the user running it:
 - gives the load user a permission set (Atlas_Seed_Record_Types) that makes every active CQ
   record type, plus Account Default, visible,
 - assigns the load user every ComplianceQuest permission set and permission set group,
+- turns on Salesforce CRM Content User for the load user and creates the document libraries CQ's
+  Default Library settings name (Controlled Document Draft/Release, Template Document Draft/Release),
+  with the load user as Library Administrator,
 - writes data\User.csv with the load user's username, so assignees in the seed resolve to them.
 
 Scratch orgs only: it grants everything, including CQ Migration User, which skips CQ's
@@ -70,7 +73,13 @@ Write-Host 'Assigning CQ permission sets and groups...'
 $run = Invoke-Sf @('apex', 'run', '--file', 'scripts\assign-cq-access.apex', '--target-org', $Org)
 if (-not $run.success) { throw "Assignment script failed: $($run.compileProblem) $($run.exceptionMessage)" }
 $run.logs -split "`n" | Where-Object { $_ -match 'USER_DEBUG' } | ForEach-Object { Write-Host (($_ -split '\|')[-1]).Trim() }
-# 4. The load user, for assignees in the seed (matches LOAD_USER in build_sfdmu.py).
+# 4. CQ's document libraries (named in CQ's Default Library settings), with the load user as Library Administrator.
+Write-Host 'Creating CQ document libraries...'
+$libs = Invoke-Sf @('apex', 'run', '--file', 'scripts\create-cq-libraries.apex', '--target-org', $Org)
+if (-not $libs.success) { throw "Library script failed: $($libs.compileProblem) $($libs.exceptionMessage)" }
+$libs.logs -split "`n" | Where-Object { $_ -match 'USER_DEBUG' } | ForEach-Object { Write-Host (($_ -split '\|')[-1]).Trim() }
+
+# 5. The load user, for assignees in the seed (matches LOAD_USER in build_sfdmu.py).
 $user = (Invoke-Sf @('org', 'display', '--target-org', $Org)).username
 [IO.File]::WriteAllLines((Join-Path $PSScriptRoot 'data\User.csv'), [string[]]@('"Id","Username"', "`"S99000000000000001`",`"$user`""), (New-Object Text.UTF8Encoding $false))
 Write-Host "Load user for assignees: $user"
