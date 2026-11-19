@@ -141,7 +141,7 @@
       "externalId": "compliancequest__SQX_Complaint__r.compliancequest__Complaint_Title__c"
     },
     {
-      "query": "SELECT Id, compliancequest__Document_Number__c, compliancequest__Title__c, RecordTypeId, compliancequest__Document_Status__c, compliancequest__Revision__c, compliancequest__Document_Category__c, compliancequest__SQX_Business_Unit__c, compliancequest__Description__c FROM compliancequest__SQX_Controlled_Document__c",
+      "query": "SELECT Id, compliancequest__Document_Number__c, compliancequest__Title__c, RecordTypeId, compliancequest__Document_Status__c, compliancequest__Revision__c, compliancequest__Document_Category__c, compliancequest__SQX_Business_Unit__c, compliancequest__Description__c, compliancequest__SQX_Site__c, compliancequest__SQX_Department__c, compliancequest__SQX_Part__c, compliancequest__Effective_Date__c, compliancequest__Review_Interval__c, compliancequest__Duration__c FROM compliancequest__SQX_Controlled_Document__c",
       "operation": "Upsert",
       "externalId": "compliancequest__Document_Number__c"
     },

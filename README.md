@@ -36,13 +36,20 @@ permission set, then `sf apex run --file scripts\assign-cq-access.apex --target-
 
 Results and errors from the load land in `data\target` and `data\logs`.
 
-## What loads (32 objects, 128 records)
+Then attach the document files (see Controlled Documents below):
+
+```
+powershell -ExecutionPolicy Bypass -File .\link-document-files.ps1 -Org atlas-seed -DryRun
+powershell -ExecutionPolicy Bypass -File .\link-document-files.ps1 -Org atlas-seed
+```
+
+## What loads (32 objects, 143 records)
 
 Divisions, Business Unit, Sites, Departments, Processes, Accounts, Contacts, Suppliers, Supplier Contacts, Personnel,
 Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks (PHR task + 5 Questions, Investigation task),
 5 Nonconformances (+ Impacted Products, Defects, Containments), 5 Complaints (+ Defects),
 2 Complaint Investigations, 2 Product History Reviews,
-2 Audit Criteria documents (+ 8 Requirements), 1 Audit Program (+ 2 Scopes), 3 Audits, 3 Audit Findings.
+15 Controlled Documents (SOPs, work instructions, inspection criteria), 2 Audit Criteria documents (+ 8 Requirements), 1 Audit Program (+ 2 Scopes), 3 Audits, 3 Audit Findings.
 
 ## Choices made when converting from the spreadsheet
 
@@ -58,6 +65,19 @@ Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks
   Division by site (Houston = Consumer Drones, Piscataway = Commercial Drones).
 - **PHRs** link to the complaint and the Atlas PHR task, not to the investigation.
   CQ builds PHR checklists when a PHR is created from the complaint's PHR step; a loaded PHR may not get them.
+
+## Controlled Documents
+
+- 15 Atlas documents from the **Controlled Documents** tab: 8 SOPs, 4 work instructions and 3 inspection criteria
+  (`Inspection_Criteria` record type), plus the 2 audit criteria documents. Released ones load as **Current**;
+  WI-TST-040 is a new document still in **Draft**. Revisions are left to change orders (CQ's Revise action).
+- **Files** are one-page PDFs in `files\`, one per document, named by document number. `build_document_files.py`
+  writes them from the workbook and the text inside it.
+- **`link-document-files.ps1`** uploads each file and links it the way CQ does: the file goes into the document's
+  library (Release for Current, Draft for Draft) with its Controlled Document field set, it's linked to the
+  document, and the document's Primary Content is set to it. If the library refuses the upload, the file is published
+  to the document itself and the run says so. Documents that already have a file are skipped, so it's safe to rerun.
+  `-DryRun` previews without changing anything.
 
 ## Audits
 

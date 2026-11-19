@@ -310,18 +310,36 @@ CRITR = f"{CQ}SQX_Audit_Criteria_Document__r.{CQ}Document_Number__c"
 PROGR = f"{CQ}SQX_Audit_Program__r.{CQ}Title__c"
 AUDR = f"{CQ}SQX_Audit__r.{CQ}Title__c"
 
-# Audit criteria are Controlled Documents with the Audit_Criteria record type. Loaded as Draft:
-# requirements can only be added to a Draft document; release them by hand afterwards.
+# Controlled Documents: the audit criteria (Audit_Criteria record type, Draft: requirements can only be added to a
+# Draft document; release them by hand afterwards) and the Atlas SOPs, work instructions and inspection criteria
+# from the Controlled Documents tab (released ones load as Current). One SFDMU object for both, keyed on number.
+# Files are not loaded here: link-document-files.ps1 uploads files/<number>.pdf and sets Primary Content.
+RT_NAME = {"Controlled Document": "Controlled_Document", "Inspection Criteria": "Inspection_Criteria",
+           "Audit Criteria": "Audit_Criteria"}
 ac_cols = [f"{CQ}Document_Number__c", f"{CQ}Title__c", "RecordType.DeveloperName", f"{CQ}Document_Status__c",
-           f"{CQ}Revision__c", f"{CQ}Document_Category__c", f"{CQ}SQX_Business_Unit__r.Name", f"{CQ}Description__c"]
-add("compliancequest__SQX_Controlled_Document__c", f"{CQ}Document_Number__c", ac_cols,
-    [{f"{CQ}Document_Number__c": r["Document Number (Seed Key)"], f"{CQ}Title__c": r["Title"],
-      "RecordType.DeveloperName": "Audit_Criteria", f"{CQ}Document_Status__c": r["Document Status"],
-      f"{CQ}Revision__c": r["Revision"], f"{CQ}Document_Category__c": r["Document Category"],
-      f"{CQ}SQX_Business_Unit__r.Name": r["Business Unit"], f"{CQ}Description__c": r["Description"]}
-     for r in rows("Audit Criteria")],
+           f"{CQ}Revision__c", f"{CQ}Document_Category__c", f"{CQ}SQX_Business_Unit__r.Name", f"{CQ}Description__c",
+           f"{CQ}SQX_Site__r.Name", f"{CQ}SQX_Department__r.Name", f"{CQ}SQX_Part__r.{CQ}Part_Number__c",
+           f"{CQ}Effective_Date__c", f"{CQ}Review_Interval__c", f"{CQ}Duration__c"]
+docs = [{f"{CQ}Document_Number__c": r["Document Number (Seed Key)"], f"{CQ}Title__c": r["Title"],
+         "RecordType.DeveloperName": "Audit_Criteria", f"{CQ}Document_Status__c": r["Document Status"],
+         f"{CQ}Revision__c": r["Revision"], f"{CQ}Document_Category__c": r["Document Category"],
+         f"{CQ}SQX_Business_Unit__r.Name": r["Business Unit"], f"{CQ}Description__c": r["Description"]}
+        for r in rows("Audit Criteria")]
+for r in rows("Controlled Documents"):
+    eff = r["Effective Date"]
+    docs.append({f"{CQ}Document_Number__c": r["Document Number (Seed Key)"], f"{CQ}Title__c": r["Title"],
+                 "RecordType.DeveloperName": RT_NAME[r["Record Type"]], f"{CQ}Document_Status__c": r["Document Status"],
+                 f"{CQ}Revision__c": r["Revision"], f"{CQ}Document_Category__c": r["Document Category"],
+                 f"{CQ}SQX_Business_Unit__r.Name": r["Business Unit"], f"{CQ}Description__c": r["Description"],
+                 f"{CQ}SQX_Site__r.Name": r["Site"], f"{CQ}SQX_Department__r.Name": r["Department"],
+                 f"{CQ}SQX_Part__r.{CQ}Part_Number__c": r["Product (Part Number)"],
+                 f"{CQ}Effective_Date__c": str(eff)[:10] if eff else "",
+                 f"{CQ}Review_Interval__c": r["Review Interval (days)"], f"{CQ}Duration__c": r["Days to Complete Training"]})
+add("compliancequest__SQX_Controlled_Document__c", f"{CQ}Document_Number__c", ac_cols, docs,
     query_fields=[f"{CQ}Document_Number__c", f"{CQ}Title__c", "RecordTypeId", f"{CQ}Document_Status__c",
-                  f"{CQ}Revision__c", f"{CQ}Document_Category__c", f"{CQ}SQX_Business_Unit__c", f"{CQ}Description__c"])
+                  f"{CQ}Revision__c", f"{CQ}Document_Category__c", f"{CQ}SQX_Business_Unit__c", f"{CQ}Description__c",
+                  f"{CQ}SQX_Site__c", f"{CQ}SQX_Department__c", f"{CQ}SQX_Part__c",
+                  f"{CQ}Effective_Date__c", f"{CQ}Review_Interval__c", f"{CQ}Duration__c"])
 
 req_cols = [DOCR, f"{CQ}Section__c", f"{CQ}Topic__c", f"{CQ}Objective__c", f"{CQ}Result_Type__c"]
 add("compliancequest__SQX_Doc_Criterion_Requirement__c", f"{DOCR};{CQ}Topic__c", req_cols,
