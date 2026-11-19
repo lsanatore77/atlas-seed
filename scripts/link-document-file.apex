@@ -4,7 +4,8 @@
 //   in CQ's Default Library settings (created by grant-cq-access.ps1).
 // - The file goes into the Release library for released documents and the Draft library for drafts, and is
 //   linked to the document. If the library is missing or refuses it, the file is published to the document.
-// - A document that already has its file only gets the library fields and the library link, if missing.
+// - The file is titled with the document's title, as CQ's own upload does.
+// - A document that already has its file only gets the library fields, the library link and the title, if missing.
 String docNumber = '__NUM__';
 String fileName = '__FILE__';
 Boolean dryRun = __DRY__;
@@ -58,16 +59,25 @@ try {
         if (currentFile != null) {
             Boolean inLibrary = lib == null || [SELECT COUNT() FROM ContentDocumentLink
                                                 WHERE ContentDocumentId = :currentFile AND LinkedEntityId = :lib] > 0;
-            if (!fieldsChanged && inLibrary) {
+            ContentVersion latest = [SELECT Id, Title FROM ContentVersion WHERE ContentDocumentId = :currentFile AND IsLatest = true LIMIT 1];
+            String wantTitle = String.isBlank(d.compliancequest__Title__c) ? latest.Title : d.compliancequest__Title__c.left(255);
+            Boolean titleOk = latest.Title == wantTitle;
+            if (!fieldsChanged && inLibrary && titleOk) {
                 result = 'ALREADY LINKED: ' + docNumber;
             } else if (dryRun) {
-                result = 'WOULD FILE IN LIBRARY: ' + docNumber + (lib == null ? ' (no library found)' : '');
+                result = 'WOULD UPDATE: ' + docNumber + ' (' + (inLibrary ? '' : 'file into library; ') + (fieldsChanged ? 'library fields; ' : '') +
+                         (titleOk ? '' : 'file title') + ')' + (lib == null ? ' (no library found)' : '');
             } else {
                 String note = '';
+                if (!titleOk) {
+                    latest.Title = wantTitle;
+                    Database.SaveResult tr = Database.update(latest, false);
+                    note = tr.isSuccess() ? 'file retitled' : 'file NOT retitled: ' + tr.getErrors()[0].getMessage();
+                }
                 if (!inLibrary) {
                     Database.SaveResult lr = Database.insert(new ContentDocumentLink(ContentDocumentId = currentFile,
                         LinkedEntityId = lib, ShareType = 'I', Visibility = 'AllUsers'), false);
-                    note = lr.isSuccess() ? 'file added to library' : 'file NOT added to library: ' + lr.getErrors()[0].getMessage();
+                    note += (note == '' ? '' : '; ') + (lr.isSuccess() ? 'file added to library' : 'file NOT added to library: ' + lr.getErrors()[0].getMessage());
                 }
                 if (fieldsChanged) {
                     Database.SaveResult ur = Database.update(d, false);
@@ -80,7 +90,7 @@ try {
                      (lib == null ? ' (no library found: file goes on the document)' : '');
         } else {
             Blob body = EncodingUtil.base64Decode(fileBase64);
-            String title = (docNumber + ' ' + d.compliancequest__Title__c).left(255);
+            String title = String.isBlank(d.compliancequest__Title__c) ? docNumber : d.compliancequest__Title__c.left(255);
             String placedIn = lib == null ? 'document (no library found)' : 'library';
             ContentVersion v = new ContentVersion(Title = title, PathOnClient = fileName, VersionData = body,
                 compliancequest__Controlled_Document__c = d.Id, FirstPublishLocationId = (lib != null ? lib : d.Id));
