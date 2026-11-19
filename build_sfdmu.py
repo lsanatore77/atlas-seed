@@ -392,7 +392,7 @@ add("compliancequest__SQX_Finding__c", f"{CQ}Title__c", fnd_cols,
 
 # ---------- Equipment ----------
 # Equipment number (Name) is the key. Calibration status is carried on the equipment (Last/Next Calibration
-# Date); calibrations load as Open (CQ closes them with a sign-off), except one loaded Closed with a sign-off as a test. Procedures point at Controlled Documents.
+# Date); calibrations load as Open (the starting point: CQ closes them with a sign-off). Procedures point at Controlled Documents.
 EQR = f"{CQ}SQX_Equipment__r.Name"
 eq_cols = ["Name", f"{CQ}Equipment_Description__c", f"{CQ}Equipment_Type__c", f"{CQ}Equipment_Status__c",
            f"{CQ}Manufacturer__c", f"{CQ}Model_Number__c", f"{CQ}Serial_Number__c", f"{CQ}Equipment_Location__c",
@@ -470,7 +470,7 @@ add("compliancequest__SQX_Equipment_Event_Schedule__c", f"{EQR};{CQ}Uniqueness_C
 
 # ---------- Inspections ----------
 # Specifications sit under the Inspection Criteria documents (key: Specification Number). CQ only accepts them on a
-# Draft criteria document, so the IC-REC documents load as Draft. Inspections (key: Lot Number) are Draft or Open with
+# Draft criteria document, so the IC-REC documents load as Draft. Inspections (key: Lot Number) load as Draft with
 # no criteria and no detail lines: criteria get added in CQ when an inspection is worked (CQ refuses detail lines on a
 # closed inspection, so none are loaded closed). Create NC If Inspection Fails is off; failed lots point at their NCs.
 from datetime import datetime

@@ -1,7 +1,7 @@
 <#
-One-time cleanup for a scratch org loaded before the inspection redesign (2026-11-19): deletes the four seed
-inspections and the three IC-REC Inspection Criteria documents (with their files), so the next load recreates
-the documents as Draft with their specifications. Not needed for a new scratch org.
+One-time cleanup for a scratch org loaded before the starting-point rule (2026-11-19): deletes the four seed
+inspections, the three IC-REC Inspection Criteria documents (with their files) and the Closed ATL-EQ-001
+calibration, so the next load recreates them at their starting point. Not needed for a new scratch org.
 
   powershell -ExecutionPolicy Bypass -File .\cleanup-step3.ps1 -Org atlas-seed -DryRun   (preview only)
   powershell -ExecutionPolicy Bypass -File .\cleanup-step3.ps1 -Org atlas-seed

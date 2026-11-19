@@ -1,6 +1,10 @@
 # Atlas Manufacturing – dev seed data
 
-Fictional, non-regulated drone maker. ~5 records per object, all records with a status load as **Draft**.
+Fictional, non-regulated drone maker. ~5 records per object.
+
+**Starting point rule:** every record with a workflow (NCs, complaints, audits, inspections, calibrations, and later
+CAPAs, changes, training) loads at its first status (Draft, or Open where CQ starts there) and is moved forward in CQ
+by hand or by automation. Reference data (released SOPs and work instructions, parts, suppliers, equipment) loads ready to use.
 Built from `Atlas_Manufacturing_Dev_Seed_Data.xlsx`. Field names checked against the dev sandbox (CQ 16.0) on 2026-11-09.
 
 ## Load into a scratch org
@@ -48,7 +52,8 @@ powershell -ExecutionPolicy Bypass -File .\link-document-files.ps1 -Org atlas-se
 
 Only for a scratch org loaded before 2026-11-19 (IC-REC documents loaded as Current): run
 `cleanup-step3.ps1 -Org <alias> -DryRun`, then without `-DryRun`, before the load. It deletes the four seed
-inspections and the three IC-REC documents with their files so they reload as Draft.
+inspections, the three IC-REC documents with their files and the Closed ATL-EQ-001 calibration, so they reload
+at their starting point.
 
 ## What loads (37 objects, 171 records)
 
@@ -57,14 +62,14 @@ Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks
 5 Nonconformances (+ Impacted Products, Defects, Containments), 5 Complaints (+ Defects),
 2 Complaint Investigations, 2 Product History Reviews,
 15 Controlled Documents (SOPs, work instructions, inspection criteria), 2 Audit Criteria documents (+ 8 Requirements), 1 Audit Program (+ 2 Scopes), 3 Audits, 3 Audit Findings,
-6 Equipment (+ 5 Calibrations, 2 Schedules), 10 Specifications on the 3 Draft Inspection Criteria, 4 Inspections (Draft/Open, no criteria or detail lines yet).
+6 Equipment (+ 5 Calibrations, 2 Schedules), 10 Specifications on the 3 Draft Inspection Criteria, 4 Inspections (Draft, no criteria or detail lines yet).
 
 ## Choices made when converting from the spreadsheet
 
 - **Users:** assignees that CQ requires (containments) are set to the load user through `data\User.csv`.
   Other owners and "Initiated By" default to the user running the load. Personnel records are not linked to users.
 - **Inspection Criteria load as Draft** (CQ only accepts specifications on a Draft criteria document; adding them to a
-  released one needs a revision). Inspections are Draft/Open with no criteria or detail lines: add the criteria in CQ
+  released one needs a revision). Inspections load as Draft with no criteria or detail lines: add the criteria in CQ
   when you work one. None load Complete or Closed (CQ refuses detail lines on a closed inspection).
 - **Inspections don't raise NCs:** "Create NC If Inspection Fails" is off; the failed inspections point at the existing NCs.
 - **Associated Items are not loaded.** Complaints carry Part, Part Family and Lot on the header;
