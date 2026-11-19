@@ -176,7 +176,7 @@
       "externalId": "Name"
     },
     {
-      "query": "SELECT Id, compliancequest__SQX_Equipment__c, compliancequest__Calibration_Date__c, compliancequest__Performed_By__c, compliancequest__SQX_Calibration_Supplier__c, compliancequest__Calibration_Certificate_Number__c, compliancequest__Initial_Calibration_Result__c, compliancequest__Final_Calibration_Result__c, compliancequest__Adjustment_Made__c, compliancequest__Next_Calibration_Date__c, compliancequest__Calibration_Status__c, compliancequest__Calibration_Comments__c FROM compliancequest__SQX_Calibration__c",
+      "query": "SELECT Id, compliancequest__SQX_Equipment__c, compliancequest__Calibration_Date__c, compliancequest__Performed_By__c, compliancequest__SQX_Calibration_Supplier__c, compliancequest__Calibration_Certificate_Number__c, compliancequest__Initial_Calibration_Result__c, compliancequest__Final_Calibration_Result__c, compliancequest__Adjustment_Made__c, compliancequest__Next_Calibration_Date__c, compliancequest__Calibration_Status__c, compliancequest__Calibration_Comments__c, compliancequest__Sign_Off_By__c, compliancequest__Sign_Off_Date__c, compliancequest__Sign_Off_Comment__c FROM compliancequest__SQX_Calibration__c",
       "operation": "Upsert",
       "externalId": "compliancequest__SQX_Equipment__r.Name;compliancequest__Calibration_Date__c"
     },
