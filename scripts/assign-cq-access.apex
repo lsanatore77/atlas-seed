@@ -3,6 +3,15 @@
 Set<String> cqNamespaces = new Set<String>{ 'compliancequest', 'cqext', 'cqcollab' };
 Id me = UserInfo.getUserId();
 
+// Libraries (CQ's document content) need the Salesforce CRM Content User setting on the user.
+User loadUser = [SELECT Id, UserPermissionsSFContentUser FROM User WHERE Id = :me];
+if (!loadUser.UserPermissionsSFContentUser) {
+    loadUser.UserPermissionsSFContentUser = true;
+    Database.SaveResult cu = Database.update(loadUser, false);
+    System.debug(cu.isSuccess() ? 'Salesforce CRM Content User turned on'
+                                : 'Salesforce CRM Content User NOT turned on: ' + cu.getErrors()[0].getMessage());
+}
+
 Set<Id> held = new Set<Id>();
 for (PermissionSetAssignment a : [SELECT PermissionSetId, PermissionSetGroupId FROM PermissionSetAssignment WHERE AssigneeId = :me]) {
     held.add(a.PermissionSetId);

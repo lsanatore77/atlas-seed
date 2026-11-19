@@ -23,7 +23,10 @@ sf sfdmu run --sourceusername csvfile --targetusername atlas-seed --path data --
 3. Assigns that permission set plus **every** CQ permission set and permission set group
    (`compliancequest`, `cqext`, `cqcollab`) to the load user. Anything already assigned is skipped, and any
    that Salesforce refuses (for example, one needing a licence the user lacks) is listed rather than stopping the run.
-4. Writes `data\User.csv` with the load user's username. Assignees in the seed (for now, containment
+4. Turns on **Salesforce CRM Content User** for the load user and creates the document libraries that CQ's
+   **CQ Default Library** settings name (Controlled Document Draft/Release, Template Document Draft/Release), with the
+   load user as Library Administrator. Libraries that already exist are left alone. This replaces setting them up by hand.
+5. Writes `data\User.csv` with the load user's username. Assignees in the seed (for now, containment
    assignees: CQ copies the assignee to the owner, which can't be blank) point at this user, so they work in
    any org. Run the script again after rebuilding the CSVs, since the rebuild clears the `data` folder.
 
@@ -75,11 +78,12 @@ Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks
   controlled document's Primary Content is its editable source (a PDF would be the Secondary rendition).
   `build_document_files.py` holds the text and runs `scripts\make-docx.js` (docx-js keeps each file about 12 KB, so
   the link script can send it in one Apex run).
-- **`link-document-files.ps1`** uploads each file and links it the way CQ does: the file goes into the document's
-  library (Release for Current, Draft for Draft) with its Controlled Document field set, it's linked to the
-  document, and the document's Primary Content is set to it. If the library refuses the upload, the file is published
-  to the document itself and the run says so. Documents that already have a file are skipped, so it's safe to rerun.
-  `-DryRun` previews without changing anything.
+- **`link-document-files.ps1`** uploads each file and links it the way CQ does. A loaded document has no library, so
+  its Draft and Release Library fields are filled from CQ's default libraries. The file goes into the document's
+  library (Release for Current, Draft for Draft) with its Controlled Document field set, it's linked to the document,
+  and the document's Primary Content is set to it. If no library is found, or it refuses the upload, the file is
+  published to the document itself and the run says so. Documents that already have their file only get the library
+  fields and the library link, if those are missing, so it's safe to rerun. `-DryRun` previews without changing anything.
 
 ## Audits
 
