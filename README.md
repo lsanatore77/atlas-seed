@@ -81,9 +81,9 @@ Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks
 - **`link-document-files.ps1`** uploads each file and links it the way CQ does. A loaded document has no library, so
   its Draft and Release Library fields are filled from CQ's default libraries. The file goes into the document's
   library (Release for Current, Draft for Draft) with its Controlled Document field set, it's linked to the document,
-  and the document's Primary Content is set to it. If no library is found, or it refuses the upload, the file is
+  and the document's Primary Content is set to it. The file is titled with the document's title, as CQ's own upload does. If no library is found, or it refuses the upload, the file is
   published to the document itself and the run says so. Documents that already have their file only get the library
-  fields and the library link, if those are missing, so it's safe to rerun. `-DryRun` previews without changing anything.
+  fields, the library link and the title, if those are missing, so it's safe to rerun. `-DryRun` previews without changing anything.
 
 ## Audits
 
