@@ -60,6 +60,9 @@ Part Families, Parts, Lot Info, Hierarchical Codes, Yes/No Result Type, CQ Tasks
 - **Users:** assignees that CQ requires (containments) are set to the load user through `data\User.csv`.
   Other owners and "Initiated By" default to the user running the load. Personnel records are not linked to users.
   On inspections the load user is also completer and closure reviewer; CQ's migration permission allows that for the load.
+- **Inspection Details update CQ's own lines.** CQ copies each specification into a detail line when an inspection is
+  created, so the details load as Update. Run the load **twice** the first time: run 1 creates the inspections (CQ adds the lines),
+  run 2 fills in the results.
 - **Inspections don't raise NCs:** "Create NC If Inspection Fails" is off; the failed inspections point at the existing NCs.
 - **Associated Items are not loaded.** Complaints carry Part, Part Family and Lot on the header;
   CQ creates the primary associated item itself as the complaint moves forward.

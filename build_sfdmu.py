@@ -558,7 +558,11 @@ for r in rows("Inspection Details"):
                  f"{CQ}Defective_Quantity__c": num(r["Defective Quantity"]),
                  f"{CQ}Number_of_Defects__c": num(r["Defective Quantity"]), EQR: r["Equipment"],
                  f"{CQ}Equipment_Calibrated__c": tf(r["Equipment Calibrated"]), f"{CQ}Observation__c": r["Observation"]})
-add("compliancequest__SQX_Inspection_Detail__c", f"{INSR};{SPECR}", det_cols, dets, query_fields=qf(det_cols))
+# Update, not Upsert: CQ copies each specification into a detail line when the inspection is created, so these rows
+# fill in CQ's lines (matched on inspection + specification) instead of adding a second set. SFDMU reads the org
+# before it writes, so the lines only exist to match on the second run: load once, then run again for the results.
+add("compliancequest__SQX_Inspection_Detail__c", f"{INSR};{SPECR}", det_cols, dets, query_fields=qf(det_cols),
+    operation="Update")
 
 # ---------- Source Ids ----------
 # SFDMU did not resolve the "<Lookup>__r.<ExternalId>" columns on their own (every lookup and record type

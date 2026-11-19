@@ -197,7 +197,7 @@
     },
     {
       "query": "SELECT Id, compliancequest__SQX_Inspection__c, compliancequest__SQX_Specification__c, compliancequest__Characteristics__c, compliancequest__Specification__c, compliancequest__Lower_Spec_Limit__c, compliancequest__Upper_Spec_Limit__c, compliancequest__Impact__c, compliancequest__Inspection_Method__c, compliancequest__Sample_Size__c, compliancequest__Observed_Value__c, compliancequest__Result__c, compliancequest__Defective_Quantity__c, compliancequest__Number_of_Defects__c, compliancequest__SQX_Equipment__c, compliancequest__Equipment_Calibrated__c, compliancequest__Observation__c FROM compliancequest__SQX_Inspection_Detail__c",
-      "operation": "Upsert",
+      "operation": "Update",
       "externalId": "compliancequest__SQX_Inspection__r.compliancequest__Lot_Number__c;compliancequest__SQX_Specification__r.compliancequest__Specification_Number__c"
     }
   ]
